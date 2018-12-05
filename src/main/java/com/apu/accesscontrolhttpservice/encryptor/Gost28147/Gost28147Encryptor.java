@@ -22,7 +22,8 @@ public class Gost28147Encryptor implements Encryptor {
     private final int HANDLING_BUF_SIZE = 24;
     private final int BYTE_MASK = 0xFF;
     
-    int[][] sBlock = {
+    private int[][] keyBlock;
+    private int[][] sBlock = {
             {1,15,13,0,5,7,10,4,9,2,3,14,6,11,8,12},
             {13,11,4,1,3,15,5,9,0,10,14,7,6,8,2,12},
             {4,11,10,0,7,2,1,13,3,6,8,5,9,12,15,14},
@@ -32,16 +33,15 @@ public class Gost28147Encryptor implements Encryptor {
             {14,11,4,12,6,13,15,10,2,3,8,1,0,7,5,9},
             {4,10,9,2,13,8,0,14,6,11,1,12,7,15,5,3}
     };
-
-    int[][] keyBlock = new int[KEY_BLOCK_ROWS][KEY_BLOCK_COLS];
     
     /*------------------------------------------------------------------------*/
     public Gost28147Encryptor() {
-        loadSecurityKey();
+        keyBlock = new int[KEY_BLOCK_ROWS][KEY_BLOCK_COLS];
+        loadSecurityKey(keyBlock);
     }
     
     /*------------------------------------------------------------------------*/
-    private void loadSecurityKey() {
+    private void loadSecurityKey(int[][] keyBlock) {        
         String keyStr = 
                 PropertyLoader.getPropertyFromFile(PROPERTIES_FILE_NAME, 
                                                     SECUR_KEY_PROPERTY);
