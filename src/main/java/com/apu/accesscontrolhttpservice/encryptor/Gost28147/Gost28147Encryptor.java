@@ -338,12 +338,12 @@ public class Gost28147Encryptor implements Encryptor {
     }
     
     /*------------------------------------------------------------------------*/
-    public String encodeProcess(String inputStr) {
-        if(inputStr.length() != 48)
+    public byte[] encodeProcess(byte[] inputBytes) {
+        if(inputBytes.length != 24)
             throw new IllegalArgumentException("Input message length incorrect.");
         eraseAll();
         
-        allbuff = DatatypeConverter.parseHexBinary(inputStr);
+        allbuff = inputBytes;//DatatypeConverter.parseHexBinary(inputStr);
         
         buffer_N1[0]=((int)allbuff[16]&0xFF);
         buffer_N1[1]=((int)allbuff[17]&0xFF);
@@ -411,7 +411,7 @@ public class Gost28147Encryptor implements Encryptor {
         decodebuff[6]=(byte)(buffer_N2[2]);
         decodebuff[7]=(byte)(buffer_N2[3]);
         
-        return new String(Hex.encodeHex(decodebuff));
+        return decodebuff;
     }
     
     public static void main(String[] args) {
@@ -427,7 +427,7 @@ public class Gost28147Encryptor implements Encryptor {
         
         source = result;
         result = 
-           encryptor.encodeProcess(source);
+           encryptor.encode(source);
         System.out.println("Decrypt");
         System.out.println("src: " + source);
         System.out.println("res: " + result); 
@@ -437,20 +437,40 @@ public class Gost28147Encryptor implements Encryptor {
     public String decode(String str) {
         return this.decodeProcess(str);
     }
+    
+    @Override
+    public String decode(byte[] bytes) {
+        return this.decode(new String(Hex.encodeHex(bytes))); 
+    }
+    
+    @Override
+    public byte[] decode2bytes(String str) {
+        return DatatypeConverter.parseHexBinary(this.decode(str));
+    }
 
     @Override
-    public byte[] decode(byte[] str) {
+    public byte[] decode2bytes(byte[] bytes) {
         throw new UnsupportedOperationException("Not supported yet."); 
     }
 
     @Override
     public String encode(String str) {
-        return this.encodeProcess(str); 
+         return this.encode(DatatypeConverter.parseHexBinary(str));
+    }
+    
+    @Override
+    public String encode(byte[] bytes) {
+        return new String(Hex.encodeHex(this.encode2bytes(bytes)));
     }
 
     @Override
-    public byte[] encode(byte[] str) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+    public byte[] encode2bytes(String str) {
+        return this.encode2bytes(DatatypeConverter.parseHexBinary(str));
     }
     
+    @Override
+    public byte[] encode2bytes(byte[] bytes) {
+        return this.encodeProcess(bytes);
+    }
+
 }

@@ -44,7 +44,7 @@ public class CamelConfiguration implements Configuration {
     int tctPort;
     
     private void initProcesses() {
-        encryptor = null;
+        encryptor = new Gost28147Encryptor();
         parser = new SntParser();
         serializer = new GsonJsonSerializer();
         httpHost = "localhost";
@@ -68,10 +68,7 @@ public class CamelConfiguration implements Configuration {
                     
                     //decrypt
 //                    pktdata = "0000000000000000";
-                    Gost28147Encryptor gostEncryptor = new Gost28147Encryptor();
-                    String encoded = gostEncryptor.decodeProcess(true, pktdata);
-                    byte[] decodedBytes = 
-                            DatatypeConverter.parseHexBinary(encoded);
+                    byte[] decodedBytes = encryptor.decode2bytes(pktdata);
                     
                     //parse
                     Object obj = null;
@@ -129,7 +126,7 @@ public class CamelConfiguration implements Configuration {
                     //encrypt
                     byte[] encryptedBytes = null;
                     if(convertedBytes != null)
-                        encryptedBytes = encryptor.encode(convertedBytes, encriptionKey);
+                        encryptedBytes = encryptor.encode2bytes(convertedBytes);
 
                     exchange.getOut().setBody(pktdata + "\r\n" 
                         + name + "\r\n"

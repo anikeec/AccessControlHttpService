@@ -12,11 +12,19 @@ package com.apu.accesscontrolhttpservice.encryptor;
 public interface Encryptor {
 
     String decode(String str);
+    
+    String decode(byte[] bytes);
+    
+    byte[] decode2bytes(String str);
 
-    byte[] decode(byte[] str);
+    byte[] decode2bytes(byte[] bytes);
 
     String encode(String str);
+    
+    String encode(byte[] bytes);
+    
+    byte[] encode2bytes(String str);
 
-    byte[] encode(byte[] str);
+    byte[] encode2bytes(byte[] bytes);
     
 }

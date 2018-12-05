@@ -5,6 +5,7 @@
  */
 package com.apu.accesscontrolhttpservice.encryptor.Gost28147;
 
+import javax.xml.bind.DatatypeConverter;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -46,12 +47,11 @@ public class Gost28147EncryptorTest {
     @Test
     public void testCryptProcess() {
         System.out.println("cryptProcess");
-        boolean cryptDecrypt = false;
-        String inputStr = decoded;
         Gost28147Encryptor instance = new Gost28147Encryptor();
-        String expResult = encoded;
-        String result = instance.encodeProcess(inputStr);
-        assertTrue(expResult.equalsIgnoreCase(result));
+        byte[] inputBytes = DatatypeConverter.parseHexBinary(decoded);
+        byte[] expResult = DatatypeConverter.parseHexBinary(encoded);        
+        byte[] result = instance.encodeProcess(inputBytes);
+        assertArrayEquals(expResult, result);
     }
 
     /**
