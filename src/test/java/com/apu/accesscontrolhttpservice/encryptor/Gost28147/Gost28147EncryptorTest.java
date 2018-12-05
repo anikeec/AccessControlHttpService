@@ -5,6 +5,7 @@
  */
 package com.apu.accesscontrolhttpservice.encryptor.Gost28147;
 
+import com.apu.accesscontrolhttpservice.encryptor.Encryptor;
 import javax.xml.bind.DatatypeConverter;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -42,28 +43,28 @@ public class Gost28147EncryptorTest {
     }
 
     /**
-     * Test of cryptProcess method, of class Gost28147Encryptor.
+     * Test of encode2bytes method, of class Gost28147Encryptor.
      */
     @Test
-    public void testCryptProcess() {
-        System.out.println("cryptProcess");
-        Gost28147Encryptor instance = new Gost28147Encryptor();
+    public void testEncode2bytes() {
+        System.out.println("encode2bytes");
+        Encryptor instance = new Gost28147Encryptor();
         byte[] inputBytes = DatatypeConverter.parseHexBinary(decoded);
         byte[] expResult = DatatypeConverter.parseHexBinary(encoded);        
-        byte[] result = instance.encode24bytesProcess(inputBytes);
+        byte[] result = instance.encode2bytes(inputBytes);
         assertArrayEquals(expResult, result);
     }
 
     /**
-     * Test of decryptProcess method, of class Gost28147Encryptor.
+     * Test of decode2bytes method, of class Gost28147Encryptor.
      */
     @Test
-    public void testDecryptProcess() {
-        System.out.println("decryptProcess");
-        Gost28147Encryptor instance = new Gost28147Encryptor();
+    public void testDecode2bytes() {
+        System.out.println("decode2bytes");
+        Encryptor instance = new Gost28147Encryptor();
         byte[] inputBytes = DatatypeConverter.parseHexBinary(encoded);
         byte[] expResult = DatatypeConverter.parseHexBinary(decoded);        
-        byte[] result = instance.decode24bytesProcess(inputBytes);
+        byte[] result = instance.decode2bytes(inputBytes);
         assertArrayEquals(expResult, result);
     }
     

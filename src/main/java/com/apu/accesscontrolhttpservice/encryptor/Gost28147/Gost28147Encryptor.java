@@ -303,7 +303,7 @@ public class Gost28147Encryptor implements Encryptor {
     }
     
     /*------------------------------------------------------------------------*/
-    public byte[] decode24bytesProcess(byte[] input) {
+    private byte[] decode24bytesProcess(byte[] input) {
         if(input.length != HANDLING_BUF_SIZE)
             throw new IllegalArgumentException("Input message length incorrect.");
         
@@ -376,7 +376,7 @@ public class Gost28147Encryptor implements Encryptor {
     }
     
     /*------------------------------------------------------------------------*/
-    public byte[] encode24bytesProcess(byte[] input) {
+    private byte[] encode24bytesProcess(byte[] input) {
         if(input.length != HANDLING_BUF_SIZE)
             throw new IllegalArgumentException("Input message length incorrect.");
         
