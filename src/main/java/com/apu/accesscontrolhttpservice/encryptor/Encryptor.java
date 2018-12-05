@@ -27,4 +27,6 @@ public interface Encryptor {
 
     byte[] encode2bytes(byte[] bytes);
     
+    boolean crc16Check(byte[] bytes);
+    
 }

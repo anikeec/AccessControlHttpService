@@ -67,15 +67,21 @@ public class CamelConfiguration implements Configuration {
                     String name = (String)exchange.getIn().getHeader("name");
                     
                     //decrypt
-//                    pktdata = "0000000000000000";
-                    byte[] decodedBytes = encryptor.decode2bytes(pktdata);
+//                    pktdata = "0000000000000000"; 
+                    byte[] receivedBytes = 
+                            DatatypeConverter.parseHexBinary(pktdata);
+
+                    byte[] decodedBytes = encryptor.decode2bytes(receivedBytes);
+                        
+                    if(!encryptor.crc16Check(decodedBytes))//crc OK
+                        decodedBytes = null;
                     
                     //parse
                     Object obj = null;
                     if(decodedBytes != null)
                         obj = parser.parse(decodedBytes);
                     
-                    
+                    /*
                     //temp
                     int deviceNumber = 15;
                     int packetNumber = 25;
@@ -128,12 +134,14 @@ public class CamelConfiguration implements Configuration {
                     if(convertedBytes != null)
                         encryptedBytes = encryptor.encode2bytes(convertedBytes);
 
-                    exchange.getOut().setBody(pktdata + "\r\n" 
-                        + name + "\r\n"
-                        + response + "\r\n"
-                        + new String(encryptedBytes)
-                        );
                     template.stop();
+                    */
+                    String response = (String)obj;
+                    byte[] encryptedBytes = {};
+
+                    exchange.getOut().setBody(response
+                        + new String(encryptedBytes)
+                        );                    
                 }
             };
 

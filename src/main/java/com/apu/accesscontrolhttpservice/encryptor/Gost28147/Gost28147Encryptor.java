@@ -484,6 +484,7 @@ public class Gost28147Encryptor implements Encryptor {
     }
 
     /*------------------------------------------------------------------------*/
+    @Override
     public boolean crc16Check(byte[] buffer) {
         if(buffer.length != HANDLING_BUF_SIZE)
             throw new IllegalArgumentException("Input buffer length incorrect.");
