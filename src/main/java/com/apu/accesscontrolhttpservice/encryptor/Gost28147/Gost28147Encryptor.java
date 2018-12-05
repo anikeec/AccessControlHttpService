@@ -119,8 +119,10 @@ public class Gost28147Encryptor implements Encryptor {
     /*------------------------------------------------------------------------*/
     private void loadSecurityKey(int[][] keyBlock) {        
         String keyStr = 
-                PropertyLoader.getPropertyFromFile(PROPERTIES_FILE_NAME, 
+                new PropertyLoader().getPropertyFromFile(PROPERTIES_FILE_NAME, 
                                                     SECUR_KEY_PROPERTY);
+        if(keyStr == null)
+            return;
         byte[] keyBytes = DatatypeConverter.parseHexBinary(keyStr);
         int index = 0;
         for(int row=0; row<KEY_BLOCK_ROWS; row++) {        

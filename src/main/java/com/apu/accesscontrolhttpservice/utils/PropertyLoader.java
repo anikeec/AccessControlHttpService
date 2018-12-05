@@ -22,7 +22,7 @@ public class PropertyLoader {
     
     private static final Logger LOGGER = LogManager.getLogger(PropertyLoader.class.getName());
     
-    public static String getPropertyFromFile(String filename, String property) {
+    public String getPropertyFromFile(String filename, String property) {
         if((filename == null) || (property == null))
             throw new IllegalArgumentException("Input parameters haven't be null");
         
@@ -30,7 +30,7 @@ public class PropertyLoader {
         InputStream is = null;
         Properties prop = new Properties();        
         try {
-            is = PropertyLoader.class.getClassLoader().getResourceAsStream(filename);
+            is = this.getClass().getResourceAsStream("/"+filename);
             prop.load(is);
             result = prop.getProperty(property);            
         } catch (IOException ex) {
