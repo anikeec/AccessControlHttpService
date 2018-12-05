@@ -47,13 +47,11 @@ public class Gost28147EncryptorTest {
     public void testCryptProcess() {
         System.out.println("cryptProcess");
         boolean cryptDecrypt = false;
-        String inputStr = "";
+        String inputStr = decoded;
         Gost28147Encryptor instance = new Gost28147Encryptor();
-        String expResult = "";
-        String result = instance.cryptProcess(cryptDecrypt, inputStr);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        String expResult = encoded;
+        String result = instance.decryptProcess(inputStr);
+        assertTrue(expResult.equalsIgnoreCase(result));
     }
 
     /**
@@ -66,7 +64,7 @@ public class Gost28147EncryptorTest {
         Gost28147Encryptor instance = new Gost28147Encryptor();
         String expResult = decoded;
         String result = instance.cryptProcess(true, inputStr);
-        assertEquals(expResult, result);
+        assertTrue(expResult.equalsIgnoreCase(result));
     }
     
 }

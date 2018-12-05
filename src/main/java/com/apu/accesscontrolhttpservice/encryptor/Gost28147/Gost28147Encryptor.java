@@ -360,14 +360,14 @@ public class Gost28147Encryptor {
         
         allbuff = DatatypeConverter.parseHexBinary(inputStr);
         
-        buffer_N1[0]=allbuff[16];
-        buffer_N1[1]=allbuff[17];
-        buffer_N1[2]=allbuff[18];
-        buffer_N1[3]=allbuff[19];
-        buffer_N2[0]=allbuff[20];
-        buffer_N2[1]=allbuff[21];
-        buffer_N2[2]=allbuff[22];
-        buffer_N2[3]=allbuff[23];
+        buffer_N1[0]=((int)allbuff[16]&0xFF);
+        buffer_N1[1]=((int)allbuff[17]&0xFF);
+        buffer_N1[2]=((int)allbuff[18]&0xFF);
+        buffer_N1[3]=((int)allbuff[19]&0xFF);
+        buffer_N2[0]=((int)allbuff[20]&0xFF);
+        buffer_N2[1]=((int)allbuff[21]&0xFF);
+        buffer_N2[2]=((int)allbuff[22]&0xFF);
+        buffer_N2[3]=((int)allbuff[23]&0xFF);
         for(int i=0; i<4; i++) {
             buffer_N1[i] &= 0xFF;
             buffer_N2[i] &= 0xFF;
@@ -382,49 +382,49 @@ public class Gost28147Encryptor {
         decodebuff[22]=(byte)buffer_N2[2];
         decodebuff[23]=(byte)buffer_N2[3];
 
-        buffer_N1[0]=allbuff[8];
-        buffer_N1[1]=allbuff[9];
-        buffer_N1[2]=allbuff[10];
-        buffer_N1[3]=allbuff[11];
-        buffer_N2[0]=allbuff[12];
-        buffer_N2[1]=allbuff[13];
-        buffer_N2[2]=allbuff[14];
-        buffer_N2[3]=allbuff[15];
+        buffer_N1[0]=((int)allbuff[8]^decodebuff[16]);
+        buffer_N1[1]=((int)allbuff[9]^decodebuff[17]);
+        buffer_N1[2]=((int)allbuff[10]^decodebuff[18]);
+        buffer_N1[3]=((int)allbuff[11]^decodebuff[19]);
+        buffer_N2[0]=((int)allbuff[12]^decodebuff[20]);
+        buffer_N2[1]=((int)allbuff[13]^decodebuff[21]);
+        buffer_N2[2]=((int)allbuff[14]^decodebuff[22]);
+        buffer_N2[3]=((int)allbuff[15]^decodebuff[23]);
         for(int i=0; i<4; i++) {
             buffer_N1[i] &= 0xFF;
             buffer_N2[i] &= 0xFF;
         }
             gostdecrypt();
-        decodebuff[8]=(byte)(buffer_N1[0]^allbuff[16]);
-        decodebuff[9]=(byte)(buffer_N1[1]^allbuff[17]);
-        decodebuff[10]=(byte)(buffer_N1[2]^allbuff[18]);
-        decodebuff[11]=(byte)(buffer_N1[3]^allbuff[19]);
-        decodebuff[12]=(byte)(buffer_N2[0]^allbuff[20]);
-        decodebuff[13]=(byte)(buffer_N2[1]^allbuff[21]);
-        decodebuff[14]=(byte)(buffer_N2[2]^allbuff[22]);
-        decodebuff[15]=(byte)(buffer_N2[3]^allbuff[23]);
+        decodebuff[8]=(byte)(buffer_N1[0]);
+        decodebuff[9]=(byte)(buffer_N1[1]);
+        decodebuff[10]=(byte)(buffer_N1[2]);
+        decodebuff[11]=(byte)(buffer_N1[3]);
+        decodebuff[12]=(byte)(buffer_N2[0]);
+        decodebuff[13]=(byte)(buffer_N2[1]);
+        decodebuff[14]=(byte)(buffer_N2[2]);
+        decodebuff[15]=(byte)(buffer_N2[3]);
 
-        buffer_N1[0]=allbuff[0];
-        buffer_N1[1]=allbuff[1];
-        buffer_N1[2]=allbuff[2];
-        buffer_N1[3]=allbuff[3];
-        buffer_N2[0]=allbuff[4];
-        buffer_N2[1]=allbuff[5];
-        buffer_N2[2]=allbuff[6];
-        buffer_N2[3]=allbuff[7];
+        buffer_N1[0]=((int)allbuff[0]^decodebuff[16]);
+        buffer_N1[1]=((int)allbuff[1]^decodebuff[17]);
+        buffer_N1[2]=((int)allbuff[2]^decodebuff[18]);
+        buffer_N1[3]=((int)allbuff[3]^decodebuff[19]);
+        buffer_N2[0]=((int)allbuff[4]^decodebuff[20]);
+        buffer_N2[1]=((int)allbuff[5]^decodebuff[21]);
+        buffer_N2[2]=((int)allbuff[6]^decodebuff[22]);
+        buffer_N2[3]=((int)allbuff[7]^decodebuff[23]);
         for(int i=0; i<4; i++) {
             buffer_N1[i] &= 0xFF;
             buffer_N2[i] &= 0xFF;
         }
             gostdecrypt();
-        decodebuff[0]=(byte)(buffer_N1[0]^allbuff[16]);
-        decodebuff[1]=(byte)(buffer_N1[1]^allbuff[17]);
-        decodebuff[2]=(byte)(buffer_N1[2]^allbuff[18]);
-        decodebuff[3]=(byte)(buffer_N1[3]^allbuff[19]);
-        decodebuff[4]=(byte)(buffer_N2[0]^allbuff[20]);
-        decodebuff[5]=(byte)(buffer_N2[1]^allbuff[21]);
-        decodebuff[6]=(byte)(buffer_N2[2]^allbuff[22]);
-        decodebuff[7]=(byte)(buffer_N2[3]^allbuff[23]);
+        decodebuff[0]=(byte)(buffer_N1[0]);
+        decodebuff[1]=(byte)(buffer_N1[1]);
+        decodebuff[2]=(byte)(buffer_N1[2]);
+        decodebuff[3]=(byte)(buffer_N1[3]);
+        decodebuff[4]=(byte)(buffer_N2[0]);
+        decodebuff[5]=(byte)(buffer_N2[1]);
+        decodebuff[6]=(byte)(buffer_N2[2]);
+        decodebuff[7]=(byte)(buffer_N2[3]);
         
         return new String(Hex.encodeHex(decodebuff));
     }
@@ -442,7 +442,7 @@ public class Gost28147Encryptor {
         
         source = result;
         result = 
-           encryptor.cryptProcess(false, source);
+           encryptor.decryptProcess(source);
         System.out.println("Decrypt");
         System.out.println("src: " + source);
         System.out.println("res: " + result);
