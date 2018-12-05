@@ -20,27 +20,14 @@ public class Gost28147Encryptor implements Encryptor {
     private final String SECUR_KEY_PROPERTY = "gost28147.key";
     
     private void eraseAll() {
-        for(int i=0; i<buffer_N1.length; i++)
-            buffer_N1[i] = 0;
-        for(int i=0; i<buffer_N2.length; i++)
-            buffer_N2[i] = 0;
         for(int i=0; i<data_buffer.length; i++)
             data_buffer[i] = 0;
         for(int i=0; i<decodebuff.length; i++)
             decodebuff[i] = 0;
-        for(int i=0; i<allbuff.length; i++)
-            allbuff[i] = 0;
-        rezerv_byte = 0;
-        key_number = 0;
     }
     
-    int[] buffer_N1 = new int[4];
-    int[] buffer_N2 = new int[4];
     int[] data_buffer = new int[4];
     byte[] decodebuff = new byte[24];
-    byte[] allbuff = new byte[24];
-    int rezerv_byte;
-    byte key_number;
     
     int[][] s_block = {
             {1,15,13,0,5,7,10,4,9,2,3,14,6,11,8,12},
@@ -81,7 +68,7 @@ public class Gost28147Encryptor implements Encryptor {
         data_buffer[2]=(((s_block[2][data_buffer[2]>>4])<<4) + s_block[3][data_buffer[2] & 15]);
         data_buffer[3]=(((s_block[0][data_buffer[3]>>4])<<4) + s_block[1][data_buffer[3] & 15]);
 
-        rezerv_byte=data_buffer[3];
+        int rezerv_byte=data_buffer[3];
         data_buffer[3]=data_buffer[2];
         data_buffer[2]=data_buffer[1];
         data_buffer[1]=data_buffer[0];
@@ -104,7 +91,7 @@ public class Gost28147Encryptor implements Encryptor {
     }
     
     /*------------------------------------------------------------------------*/
-    private void addc_4byteN1() {
+    private void addc_4byteN1(Byte key_number, int[] buffer_N1) {
         int ddd0=(buffer_N1[0] + k_block[key_number][0]);
         data_buffer[0]=(ddd0 & 255);
 
@@ -119,7 +106,7 @@ public class Gost28147Encryptor implements Encryptor {
     }    
     
     /*------------------------------------------------------------------------*/
-    private void addc_4byteN2() {
+    private void addc_4byteN2(Byte key_number, int[] buffer_N2) {
         int ddd0=(buffer_N2[0] + k_block[key_number][0]);
         data_buffer[0]=(ddd0 & 255);
 
@@ -134,7 +121,7 @@ public class Gost28147Encryptor implements Encryptor {
     }    
     
     /*------------------------------------------------------------------------*/
-    private void xor_4byteN1() {
+    private void xor_4byteN1(int[] buffer_N1) {
         buffer_N1[0]=(buffer_N1[0] ^ data_buffer[0]);
         buffer_N1[1]=(buffer_N1[1] ^ data_buffer[1]);
         buffer_N1[2]=(buffer_N1[2] ^ data_buffer[2]);
@@ -142,7 +129,7 @@ public class Gost28147Encryptor implements Encryptor {
     }
     
     /*------------------------------------------------------------------------*/
-    private void xor_4byteN2() {
+    private void xor_4byteN2(int[] buffer_N2) {
         buffer_N2[0]=(buffer_N2[0] ^ data_buffer[0]);
         buffer_N2[1]=(buffer_N2[1] ^ data_buffer[1]);
         buffer_N2[2]=(buffer_N2[2] ^ data_buffer[2]);
@@ -150,75 +137,77 @@ public class Gost28147Encryptor implements Encryptor {
     }
     
     /*------------------------------------------------------------------------*/
-    private void func01() {
-        addc_4byteN1();
+    private void func01(Byte key_number, int[] buffer_N1, int[] buffer_N2) {
+        addc_4byteN1(key_number, buffer_N1);
         func_F1();
-        xor_4byteN2();
+        xor_4byteN2(buffer_N2);
     }
     
     /*------------------------------------------------------------------------*/
-    private void func02() {
-        addc_4byteN2();
+    private void func02(Byte key_number, int[] buffer_N1, int[] buffer_N2) {
+        addc_4byteN2(key_number, buffer_N2);
         func_F1();
-        xor_4byteN1();
+        xor_4byteN1(buffer_N1);
     }
     
     /*------------------------------------------------------------------------*/
-    private void decrypt01234567() {
+    private void decrypt01234567(Byte key_number, int[] buffer_N1, int[] buffer_N2) {
         key_number=0;
 
-        func01();
+        func01(key_number, buffer_N1, buffer_N2);
         key_number++;
-        func02();
-        key_number++;
-
-        func01();
-        key_number++;
-        func02();
+        func02(key_number, buffer_N1, buffer_N2);
         key_number++;
 
-        func01();
+        func01(key_number, buffer_N1, buffer_N2);
         key_number++;
-        func02();
+        func02(key_number, buffer_N1, buffer_N2);
         key_number++;
 
-        func01();
+        func01(key_number, buffer_N1, buffer_N2);
         key_number++;
-        func02();
+        func02(key_number, buffer_N1, buffer_N2);
+        key_number++;
+
+        func01(key_number, buffer_N1, buffer_N2);
+        key_number++;
+        func02(key_number, buffer_N1, buffer_N2);
         key_number++;
     }
     
     /*------------------------------------------------------------------------*/
-    private void decrypt76543210() {
+    private void decrypt76543210(Byte key_number, int[] buffer_N1, int[] buffer_N2) {
         key_number=7;
 
-        func01();
+        func01(key_number, buffer_N1, buffer_N2);
         key_number--;
-        func02();
-        key_number--;
-
-        func01();
-        key_number--;
-        func02();
+        func02(key_number, buffer_N1, buffer_N2);
         key_number--;
 
-        func01();
+        func01(key_number, buffer_N1, buffer_N2);
         key_number--;
-        func02();
+        func02(key_number, buffer_N1, buffer_N2);
         key_number--;
 
-        func01();
+        func01(key_number, buffer_N1, buffer_N2);
         key_number--;
-        func02();
+        func02(key_number, buffer_N1, buffer_N2);
+        key_number--;
+
+        func01(key_number, buffer_N1, buffer_N2);
+        key_number--;
+        func02(key_number, buffer_N1, buffer_N2);
         key_number--;
     }
     
     /*------------------------------------------------------------------------*/
-    private void gostEncode() {
-        decrypt01234567();
-        decrypt76543210();
-        decrypt76543210();
-        decrypt76543210();
+    private void gostEncode(int[] buffer_N1, int[] buffer_N2) {
+        Byte key_number = new Byte((byte)0);
+        
+        decrypt01234567(key_number, buffer_N1, buffer_N2);
+        decrypt76543210(key_number, buffer_N1, buffer_N2);
+        decrypt76543210(key_number, buffer_N1, buffer_N2);
+        decrypt76543210(key_number, buffer_N1, buffer_N2);
 
         int ddd0=buffer_N1[0];
         int ddd1=buffer_N1[1];
@@ -237,12 +226,13 @@ public class Gost28147Encryptor implements Encryptor {
     }
     
     /*------------------------------------------------------------------------*/
-    private void gostDecode() {
+    private void gostDecode(int[] buffer_N1, int[] buffer_N2) {
+        Byte key_number = new Byte((byte)0);
         
-        decrypt01234567();
-        decrypt01234567();
-        decrypt01234567();
-        decrypt76543210();
+        decrypt01234567(key_number, buffer_N1, buffer_N2);
+        decrypt01234567(key_number, buffer_N1, buffer_N2);
+        decrypt01234567(key_number, buffer_N1, buffer_N2);
+        decrypt76543210(key_number, buffer_N1, buffer_N2);
         
         int ddd0 = buffer_N1[0];
         int ddd1 = buffer_N1[1];
@@ -266,21 +256,22 @@ public class Gost28147Encryptor implements Encryptor {
             throw new IllegalArgumentException("Input message length incorrect.");
         eraseAll();
         
-        allbuff = inputBytes;
+        int[] buffer_N1 = new int[4];
+        int[] buffer_N2 = new int[4];
         
-        buffer_N1[0]=((int)allbuff[16])&0xFF;
-        buffer_N1[1]=((int)allbuff[17])&0xFF;
-        buffer_N1[2]=((int)allbuff[18])&0xFF;
-        buffer_N1[3]=((int)allbuff[19])&0xFF;
-        buffer_N2[0]=((int)allbuff[20])&0xFF;
-        buffer_N2[1]=((int)allbuff[21])&0xFF;
-        buffer_N2[2]=((int)allbuff[22])&0xFF;
-        buffer_N2[3]=((int)allbuff[23])&0xFF;
+        buffer_N1[0]=((int)inputBytes[16])&0xFF;
+        buffer_N1[1]=((int)inputBytes[17])&0xFF;
+        buffer_N1[2]=((int)inputBytes[18])&0xFF;
+        buffer_N1[3]=((int)inputBytes[19])&0xFF;
+        buffer_N2[0]=((int)inputBytes[20])&0xFF;
+        buffer_N2[1]=((int)inputBytes[21])&0xFF;
+        buffer_N2[2]=((int)inputBytes[22])&0xFF;
+        buffer_N2[3]=((int)inputBytes[23])&0xFF;
         for(int i=0; i<4; i++) {
             buffer_N1[i] &= 0xFF;
             buffer_N2[i] &= 0xFF;
         }
-        gostDecode();
+        gostDecode(buffer_N1, buffer_N2);
         decodebuff[16]=(byte)buffer_N1[0];
         decodebuff[17]=(byte)buffer_N1[1];
         decodebuff[18]=(byte)buffer_N1[2];
@@ -290,49 +281,49 @@ public class Gost28147Encryptor implements Encryptor {
         decodebuff[22]=(byte)buffer_N2[2];
         decodebuff[23]=(byte)buffer_N2[3];
 
-        buffer_N1[0]=((int)allbuff[8])&0xFF;
-        buffer_N1[1]=((int)allbuff[9])&0xFF;
-        buffer_N1[2]=((int)allbuff[10])&0xFF;
-        buffer_N1[3]=((int)allbuff[11])&0xFF;
-        buffer_N2[0]=((int)allbuff[12])&0xFF;
-        buffer_N2[1]=((int)allbuff[13])&0xFF;
-        buffer_N2[2]=((int)allbuff[14])&0xFF;
-        buffer_N2[3]=((int)allbuff[15])&0xFF;
+        buffer_N1[0]=((int)inputBytes[8])&0xFF;
+        buffer_N1[1]=((int)inputBytes[9])&0xFF;
+        buffer_N1[2]=((int)inputBytes[10])&0xFF;
+        buffer_N1[3]=((int)inputBytes[11])&0xFF;
+        buffer_N2[0]=((int)inputBytes[12])&0xFF;
+        buffer_N2[1]=((int)inputBytes[13])&0xFF;
+        buffer_N2[2]=((int)inputBytes[14])&0xFF;
+        buffer_N2[3]=((int)inputBytes[15])&0xFF;
         for(int i=0; i<4; i++) {
             buffer_N1[i] &= 0xFF;
             buffer_N2[i] &= 0xFF;
         }
-        gostDecode();
-        decodebuff[8]=(byte)(buffer_N1[0]^(((int)allbuff[16])&0xFF));
-        decodebuff[9]=(byte)(buffer_N1[1]^(((int)allbuff[17])&0xFF));
-        decodebuff[10]=(byte)(buffer_N1[2]^(((int)allbuff[18])&0xFF));
-        decodebuff[11]=(byte)(buffer_N1[3]^(((int)allbuff[19])&0xFF));
-        decodebuff[12]=(byte)(buffer_N2[0]^(((int)allbuff[20])&0xFF));
-        decodebuff[13]=(byte)(buffer_N2[1]^(((int)allbuff[21])&0xFF));
-        decodebuff[14]=(byte)(buffer_N2[2]^(((int)allbuff[22])&0xFF));
-        decodebuff[15]=(byte)(buffer_N2[3]^(((int)allbuff[23])&0xFF));
+        gostDecode(buffer_N1, buffer_N2);
+        decodebuff[8]=(byte)(buffer_N1[0]^(((int)inputBytes[16])&0xFF));
+        decodebuff[9]=(byte)(buffer_N1[1]^(((int)inputBytes[17])&0xFF));
+        decodebuff[10]=(byte)(buffer_N1[2]^(((int)inputBytes[18])&0xFF));
+        decodebuff[11]=(byte)(buffer_N1[3]^(((int)inputBytes[19])&0xFF));
+        decodebuff[12]=(byte)(buffer_N2[0]^(((int)inputBytes[20])&0xFF));
+        decodebuff[13]=(byte)(buffer_N2[1]^(((int)inputBytes[21])&0xFF));
+        decodebuff[14]=(byte)(buffer_N2[2]^(((int)inputBytes[22])&0xFF));
+        decodebuff[15]=(byte)(buffer_N2[3]^(((int)inputBytes[23])&0xFF));
 
-        buffer_N1[0]=((int)allbuff[0]&0xFF);
-        buffer_N1[1]=((int)allbuff[1]&0xFF);
-        buffer_N1[2]=((int)allbuff[2]&0xFF);
-        buffer_N1[3]=((int)allbuff[3]&0xFF);
-        buffer_N2[0]=((int)allbuff[4]&0xFF);
-        buffer_N2[1]=((int)allbuff[5]&0xFF);
-        buffer_N2[2]=((int)allbuff[6]&0xFF);
-        buffer_N2[3]=((int)allbuff[7]&0xFF);
+        buffer_N1[0]=((int)inputBytes[0]&0xFF);
+        buffer_N1[1]=((int)inputBytes[1]&0xFF);
+        buffer_N1[2]=((int)inputBytes[2]&0xFF);
+        buffer_N1[3]=((int)inputBytes[3]&0xFF);
+        buffer_N2[0]=((int)inputBytes[4]&0xFF);
+        buffer_N2[1]=((int)inputBytes[5]&0xFF);
+        buffer_N2[2]=((int)inputBytes[6]&0xFF);
+        buffer_N2[3]=((int)inputBytes[7]&0xFF);
         for(int i=0; i<4; i++) {
             buffer_N1[i] &= 0xFF;
             buffer_N2[i] &= 0xFF;
         }
-        gostDecode();
-        decodebuff[0]=(byte)(buffer_N1[0]^allbuff[16]);
-        decodebuff[1]=(byte)(buffer_N1[1]^allbuff[17]);
-        decodebuff[2]=(byte)(buffer_N1[2]^allbuff[18]);
-        decodebuff[3]=(byte)(buffer_N1[3]^allbuff[19]);
-        decodebuff[4]=(byte)(buffer_N2[0]^allbuff[20]);
-        decodebuff[5]=(byte)(buffer_N2[1]^allbuff[21]);
-        decodebuff[6]=(byte)(buffer_N2[2]^allbuff[22]);
-        decodebuff[7]=(byte)(buffer_N2[3]^allbuff[23]);
+        gostDecode(buffer_N1, buffer_N2);
+        decodebuff[0]=(byte)(buffer_N1[0]^inputBytes[16]);
+        decodebuff[1]=(byte)(buffer_N1[1]^inputBytes[17]);
+        decodebuff[2]=(byte)(buffer_N1[2]^inputBytes[18]);
+        decodebuff[3]=(byte)(buffer_N1[3]^inputBytes[19]);
+        decodebuff[4]=(byte)(buffer_N2[0]^inputBytes[20]);
+        decodebuff[5]=(byte)(buffer_N2[1]^inputBytes[21]);
+        decodebuff[6]=(byte)(buffer_N2[2]^inputBytes[22]);
+        decodebuff[7]=(byte)(buffer_N2[3]^inputBytes[23]);
         
         return decodebuff;
     }
@@ -343,21 +334,22 @@ public class Gost28147Encryptor implements Encryptor {
             throw new IllegalArgumentException("Input message length incorrect.");
         eraseAll();
         
-        allbuff = inputBytes;
+        int[] buffer_N1 = new int[4];
+        int[] buffer_N2 = new int[4];
         
-        buffer_N1[0]=((int)allbuff[16]&0xFF);
-        buffer_N1[1]=((int)allbuff[17]&0xFF);
-        buffer_N1[2]=((int)allbuff[18]&0xFF);
-        buffer_N1[3]=((int)allbuff[19]&0xFF);
-        buffer_N2[0]=((int)allbuff[20]&0xFF);
-        buffer_N2[1]=((int)allbuff[21]&0xFF);
-        buffer_N2[2]=((int)allbuff[22]&0xFF);
-        buffer_N2[3]=((int)allbuff[23]&0xFF);
+        buffer_N1[0]=((int)inputBytes[16]&0xFF);
+        buffer_N1[1]=((int)inputBytes[17]&0xFF);
+        buffer_N1[2]=((int)inputBytes[18]&0xFF);
+        buffer_N1[3]=((int)inputBytes[19]&0xFF);
+        buffer_N2[0]=((int)inputBytes[20]&0xFF);
+        buffer_N2[1]=((int)inputBytes[21]&0xFF);
+        buffer_N2[2]=((int)inputBytes[22]&0xFF);
+        buffer_N2[3]=((int)inputBytes[23]&0xFF);
         for(int i=0; i<4; i++) {
             buffer_N1[i] &= 0xFF;
             buffer_N2[i] &= 0xFF;
         }
-        gostEncode();
+        gostEncode(buffer_N1, buffer_N2);
         decodebuff[16]=(byte)buffer_N1[0];
         decodebuff[17]=(byte)buffer_N1[1];
         decodebuff[18]=(byte)buffer_N1[2];
@@ -367,19 +359,19 @@ public class Gost28147Encryptor implements Encryptor {
         decodebuff[22]=(byte)buffer_N2[2];
         decodebuff[23]=(byte)buffer_N2[3];
 
-        buffer_N1[0]=((int)allbuff[8]^decodebuff[16]);
-        buffer_N1[1]=((int)allbuff[9]^decodebuff[17]);
-        buffer_N1[2]=((int)allbuff[10]^decodebuff[18]);
-        buffer_N1[3]=((int)allbuff[11]^decodebuff[19]);
-        buffer_N2[0]=((int)allbuff[12]^decodebuff[20]);
-        buffer_N2[1]=((int)allbuff[13]^decodebuff[21]);
-        buffer_N2[2]=((int)allbuff[14]^decodebuff[22]);
-        buffer_N2[3]=((int)allbuff[15]^decodebuff[23]);
+        buffer_N1[0]=((int)inputBytes[8]^decodebuff[16]);
+        buffer_N1[1]=((int)inputBytes[9]^decodebuff[17]);
+        buffer_N1[2]=((int)inputBytes[10]^decodebuff[18]);
+        buffer_N1[3]=((int)inputBytes[11]^decodebuff[19]);
+        buffer_N2[0]=((int)inputBytes[12]^decodebuff[20]);
+        buffer_N2[1]=((int)inputBytes[13]^decodebuff[21]);
+        buffer_N2[2]=((int)inputBytes[14]^decodebuff[22]);
+        buffer_N2[3]=((int)inputBytes[15]^decodebuff[23]);
         for(int i=0; i<4; i++) {
             buffer_N1[i] &= 0xFF;
             buffer_N2[i] &= 0xFF;
         }
-        gostEncode();
+        gostEncode(buffer_N1, buffer_N2);
         decodebuff[8]=(byte)(buffer_N1[0]);
         decodebuff[9]=(byte)(buffer_N1[1]);
         decodebuff[10]=(byte)(buffer_N1[2]);
@@ -389,19 +381,19 @@ public class Gost28147Encryptor implements Encryptor {
         decodebuff[14]=(byte)(buffer_N2[2]);
         decodebuff[15]=(byte)(buffer_N2[3]);
 
-        buffer_N1[0]=((int)allbuff[0]^decodebuff[16]);
-        buffer_N1[1]=((int)allbuff[1]^decodebuff[17]);
-        buffer_N1[2]=((int)allbuff[2]^decodebuff[18]);
-        buffer_N1[3]=((int)allbuff[3]^decodebuff[19]);
-        buffer_N2[0]=((int)allbuff[4]^decodebuff[20]);
-        buffer_N2[1]=((int)allbuff[5]^decodebuff[21]);
-        buffer_N2[2]=((int)allbuff[6]^decodebuff[22]);
-        buffer_N2[3]=((int)allbuff[7]^decodebuff[23]);
+        buffer_N1[0]=((int)inputBytes[0]^decodebuff[16]);
+        buffer_N1[1]=((int)inputBytes[1]^decodebuff[17]);
+        buffer_N1[2]=((int)inputBytes[2]^decodebuff[18]);
+        buffer_N1[3]=((int)inputBytes[3]^decodebuff[19]);
+        buffer_N2[0]=((int)inputBytes[4]^decodebuff[20]);
+        buffer_N2[1]=((int)inputBytes[5]^decodebuff[21]);
+        buffer_N2[2]=((int)inputBytes[6]^decodebuff[22]);
+        buffer_N2[3]=((int)inputBytes[7]^decodebuff[23]);
         for(int i=0; i<4; i++) {
             buffer_N1[i] &= 0xFF;
             buffer_N2[i] &= 0xFF;
         }
-        gostEncode();
+        gostEncode(buffer_N1, buffer_N2);
         decodebuff[0]=(byte)(buffer_N1[0]);
         decodebuff[1]=(byte)(buffer_N1[1]);
         decodebuff[2]=(byte)(buffer_N1[2]);
