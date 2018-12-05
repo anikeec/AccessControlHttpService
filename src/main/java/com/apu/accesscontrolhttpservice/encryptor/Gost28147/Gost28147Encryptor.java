@@ -296,6 +296,13 @@ public class Gost28147Encryptor implements Encryptor {
     }
     
     /*------------------------------------------------------------------------*/
+    private void applyMaskToBuffer(int[] buffer) {
+        for(int i=0; i<buffer.length; i++) {
+            buffer[i] &= BYTE_MASK;
+        }
+    }
+    
+    /*------------------------------------------------------------------------*/
     public byte[] decode24bytesProcess(byte[] input) {
         if(input.length != HANDLING_BUF_SIZE)
             throw new IllegalArgumentException("Input message length incorrect.");
@@ -313,10 +320,8 @@ public class Gost28147Encryptor implements Encryptor {
         bufferN2[1]=inputBytes[21];
         bufferN2[2]=inputBytes[22];
         bufferN2[3]=inputBytes[23];
-        for(int i=0; i<4; i++) {
-            bufferN1[i] &= BYTE_MASK;
-            bufferN2[i] &= BYTE_MASK;
-        }
+        applyMaskToBuffer(bufferN1);
+        applyMaskToBuffer(bufferN2);
         gostDecode(bufferN1, bufferN2);
         decodebuff[16]=(byte)bufferN1[0];
         decodebuff[17]=(byte)bufferN1[1];
@@ -335,10 +340,8 @@ public class Gost28147Encryptor implements Encryptor {
         bufferN2[1]=inputBytes[13];
         bufferN2[2]=inputBytes[14];
         bufferN2[3]=inputBytes[15];
-        for(int i=0; i<4; i++) {
-            bufferN1[i] &= BYTE_MASK;
-            bufferN2[i] &= BYTE_MASK;
-        }
+        applyMaskToBuffer(bufferN1);
+        applyMaskToBuffer(bufferN2);
         gostDecode(bufferN1, bufferN2);
         decodebuff[8]=(byte)(bufferN1[0]^inputBytes[16]);
         decodebuff[9]=(byte)(bufferN1[1]^inputBytes[17]);
@@ -357,10 +360,8 @@ public class Gost28147Encryptor implements Encryptor {
         bufferN2[1]=inputBytes[5];
         bufferN2[2]=inputBytes[6];
         bufferN2[3]=inputBytes[7];
-        for(int i=0; i<4; i++) {
-            bufferN1[i] &= BYTE_MASK;
-            bufferN2[i] &= BYTE_MASK;
-        }
+        applyMaskToBuffer(bufferN1);
+        applyMaskToBuffer(bufferN2);
         gostDecode(bufferN1, bufferN2);
         decodebuff[0]=(byte)(bufferN1[0]^inputBytes[16]);
         decodebuff[1]=(byte)(bufferN1[1]^inputBytes[17]);
@@ -392,10 +393,8 @@ public class Gost28147Encryptor implements Encryptor {
         bufferN2[1]=inputBytes[21];
         bufferN2[2]=inputBytes[22];
         bufferN2[3]=inputBytes[23];
-        for(int i=0; i<4; i++) {
-            bufferN1[i] &= BYTE_MASK;
-            bufferN2[i] &= BYTE_MASK;
-        }
+        applyMaskToBuffer(bufferN1);
+        applyMaskToBuffer(bufferN2);
         gostEncode(bufferN1, bufferN2);
         decodebuff[16]=(byte)bufferN1[0];
         decodebuff[17]=(byte)bufferN1[1];
@@ -414,10 +413,8 @@ public class Gost28147Encryptor implements Encryptor {
         bufferN2[1]=inputBytes[13]^decodebuff[21];
         bufferN2[2]=inputBytes[14]^decodebuff[22];
         bufferN2[3]=inputBytes[15]^decodebuff[23];
-        for(int i=0; i<4; i++) {
-            bufferN1[i] &= BYTE_MASK;
-            bufferN2[i] &= BYTE_MASK;
-        }
+        applyMaskToBuffer(bufferN1);
+        applyMaskToBuffer(bufferN2);
         gostEncode(bufferN1, bufferN2);
         decodebuff[8]=(byte)(bufferN1[0]);
         decodebuff[9]=(byte)(bufferN1[1]);
@@ -436,10 +433,8 @@ public class Gost28147Encryptor implements Encryptor {
         bufferN2[1]=inputBytes[5]^decodebuff[21];
         bufferN2[2]=inputBytes[6]^decodebuff[22];
         bufferN2[3]=inputBytes[7]^decodebuff[23];
-        for(int i=0; i<4; i++) {
-            bufferN1[i] &= BYTE_MASK;
-            bufferN2[i] &= BYTE_MASK;
-        }
+        applyMaskToBuffer(bufferN1);
+        applyMaskToBuffer(bufferN2);
         gostEncode(bufferN1, bufferN2);
         decodebuff[0]=(byte)(bufferN1[0]);
         decodebuff[1]=(byte)(bufferN1[1]);
