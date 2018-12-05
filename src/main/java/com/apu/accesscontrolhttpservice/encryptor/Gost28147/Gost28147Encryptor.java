@@ -22,12 +22,9 @@ public class Gost28147Encryptor implements Encryptor {
     private void eraseAll() {
         for(int i=0; i<data_buffer.length; i++)
             data_buffer[i] = 0;
-        for(int i=0; i<decodebuff.length; i++)
-            decodebuff[i] = 0;
     }
     
     int[] data_buffer = new int[4];
-    byte[] decodebuff = new byte[24];
     
     int[][] s_block = {
             {1,15,13,0,5,7,10,4,9,2,3,14,6,11,8,12},
@@ -258,6 +255,7 @@ public class Gost28147Encryptor implements Encryptor {
         
         int[] buffer_N1 = new int[4];
         int[] buffer_N2 = new int[4];
+        byte[] decodebuff = new byte[24];
         
         buffer_N1[0]=((int)inputBytes[16])&0xFF;
         buffer_N1[1]=((int)inputBytes[17])&0xFF;
@@ -336,6 +334,7 @@ public class Gost28147Encryptor implements Encryptor {
         
         int[] buffer_N1 = new int[4];
         int[] buffer_N2 = new int[4];
+        byte[] decodebuff = new byte[24];
         
         buffer_N1[0]=((int)inputBytes[16]&0xFF);
         buffer_N1[1]=((int)inputBytes[17]&0xFF);
