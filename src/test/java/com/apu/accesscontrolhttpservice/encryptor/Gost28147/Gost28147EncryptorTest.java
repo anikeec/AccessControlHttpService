@@ -67,5 +67,22 @@ public class Gost28147EncryptorTest {
         byte[] result = instance.decode2bytes(inputBytes);
         assertArrayEquals(expResult, result);
     }
+
+    /**
+     * Test of crc16Check method, of class Gost28147Encryptor.
+     */
+    @Test
+    public void testCrc16Check() {
+        System.out.println("crc16Check");        
+        Gost28147Encryptor instance = new Gost28147Encryptor();
+        byte[] buffer = DatatypeConverter.parseHexBinary(decoded);
+        boolean expResult = true;
+        boolean result = instance.crc16Check(buffer);
+        assertEquals(expResult, result);
+        buffer = DatatypeConverter.parseHexBinary(encoded);
+        expResult = false;
+        result = instance.crc16Check(buffer);
+        assertEquals(expResult, result);
+    }
     
 }
