@@ -35,6 +35,47 @@ public class Gost28147Encryptor implements Encryptor {
     };
     
     /*------------------------------------------------------------------------*/
+    @Override
+    public String decode(String str) {
+        return this.decode(DatatypeConverter.parseHexBinary(str));
+    }
+    
+    @Override
+    public String decode(byte[] bytes) {
+        return new String(Hex.encodeHex(this.decode2bytes(bytes)));
+    }
+    
+    @Override
+    public byte[] decode2bytes(String str) {
+        return this.decode2bytes(DatatypeConverter.parseHexBinary(str));
+    }
+
+    @Override
+    public byte[] decode2bytes(byte[] bytes) {
+        return this.decode24bytesProcess(bytes); 
+    }
+
+    @Override
+    public String encode(String str) {
+         return this.encode(DatatypeConverter.parseHexBinary(str));
+    }
+    
+    @Override
+    public String encode(byte[] bytes) {
+        return new String(Hex.encodeHex(this.encode2bytes(bytes)));
+    }
+
+    @Override
+    public byte[] encode2bytes(String str) {
+        return this.encode2bytes(DatatypeConverter.parseHexBinary(str));
+    }
+    
+    @Override
+    public byte[] encode2bytes(byte[] bytes) {
+        return this.encode24bytesProcess(bytes);
+    }
+    
+    /*------------------------------------------------------------------------*/
     public Gost28147Encryptor() {
         keyBlock = new int[KEY_BLOCK_ROWS][KEY_BLOCK_COLS];
         loadSecurityKey(keyBlock);
@@ -410,65 +451,6 @@ public class Gost28147Encryptor implements Encryptor {
         decodebuff[7]=(byte)(bufferN2[3]);
         
         return decodebuff;
-    }
-    
-    public static void main(String[] args) {
-        Gost28147Encryptor encryptor = new Gost28147Encryptor();
-        String result;
-        
-        String source = "F0B1C9224826CEC1E6C049EBC3242A9DA8EA0FA086FE6805";
-        result = 
-           encryptor.decode(source);
-        System.out.println("Encrypt");
-        System.out.println("src: " + source);
-        System.out.println("res: " + result);
-        
-        source = result;
-        result = 
-           encryptor.encode(source);
-        System.out.println("Decrypt");
-        System.out.println("src: " + source);
-        System.out.println("res: " + result); 
-    }
-
-    @Override
-    public String decode(String str) {
-        return this.decode(DatatypeConverter.parseHexBinary(str));
-    }
-    
-    @Override
-    public String decode(byte[] bytes) {
-        return new String(Hex.encodeHex(this.decode2bytes(bytes)));
-    }
-    
-    @Override
-    public byte[] decode2bytes(String str) {
-        return this.decode2bytes(DatatypeConverter.parseHexBinary(str));
-    }
-
-    @Override
-    public byte[] decode2bytes(byte[] bytes) {
-        return this.decode24bytesProcess(bytes); 
-    }
-
-    @Override
-    public String encode(String str) {
-         return this.encode(DatatypeConverter.parseHexBinary(str));
-    }
-    
-    @Override
-    public String encode(byte[] bytes) {
-        return new String(Hex.encodeHex(this.encode2bytes(bytes)));
-    }
-
-    @Override
-    public byte[] encode2bytes(String str) {
-        return this.encode2bytes(DatatypeConverter.parseHexBinary(str));
-    }
-    
-    @Override
-    public byte[] encode2bytes(byte[] bytes) {
-        return this.encode24bytesProcess(bytes);
     }
 
 }
