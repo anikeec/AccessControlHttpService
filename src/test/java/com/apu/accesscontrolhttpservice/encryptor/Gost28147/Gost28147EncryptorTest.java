@@ -50,7 +50,7 @@ public class Gost28147EncryptorTest {
         Gost28147Encryptor instance = new Gost28147Encryptor();
         byte[] inputBytes = DatatypeConverter.parseHexBinary(decoded);
         byte[] expResult = DatatypeConverter.parseHexBinary(encoded);        
-        byte[] result = instance.encodeProcess(inputBytes);
+        byte[] result = instance.encode24bytesProcess(inputBytes);
         assertArrayEquals(expResult, result);
     }
 
@@ -63,7 +63,7 @@ public class Gost28147EncryptorTest {
         Gost28147Encryptor instance = new Gost28147Encryptor();
         byte[] inputBytes = DatatypeConverter.parseHexBinary(encoded);
         byte[] expResult = DatatypeConverter.parseHexBinary(decoded);        
-        byte[] result = instance.decodeProcess(inputBytes);
+        byte[] result = instance.decode24bytesProcess(inputBytes);
         assertArrayEquals(expResult, result);
     }
     

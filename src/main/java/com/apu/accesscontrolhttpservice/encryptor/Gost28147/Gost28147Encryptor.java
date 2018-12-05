@@ -261,7 +261,7 @@ public class Gost28147Encryptor implements Encryptor {
     }
     
     /*------------------------------------------------------------------------*/
-    public byte[] decodeProcess(byte[] inputBytes) {
+    public byte[] decode24bytesProcess(byte[] inputBytes) {
         if(inputBytes.length != 24)
             throw new IllegalArgumentException("Input message length incorrect.");
         eraseAll();
@@ -338,7 +338,7 @@ public class Gost28147Encryptor implements Encryptor {
     }
     
     /*------------------------------------------------------------------------*/
-    public byte[] encodeProcess(byte[] inputBytes) {
+    public byte[] encode24bytesProcess(byte[] inputBytes) {
         if(inputBytes.length != 24)
             throw new IllegalArgumentException("Input message length incorrect.");
         eraseAll();
@@ -450,7 +450,7 @@ public class Gost28147Encryptor implements Encryptor {
 
     @Override
     public byte[] decode2bytes(byte[] bytes) {
-        return this.decodeProcess(bytes); 
+        return this.decode24bytesProcess(bytes); 
     }
 
     @Override
@@ -470,7 +470,7 @@ public class Gost28147Encryptor implements Encryptor {
     
     @Override
     public byte[] encode2bytes(byte[] bytes) {
-        return this.encodeProcess(bytes);
+        return this.encode24bytesProcess(bytes);
     }
 
 }
