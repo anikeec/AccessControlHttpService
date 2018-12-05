@@ -61,7 +61,7 @@ public class CamelConfiguration implements Configuration {
         
         CamelContext context = new DefaultCamelContext();        
         try {  
-            Processor httpRouteProcessor = new Processor() {
+            final Processor httpRouteProcessor = new Processor() {
                 public void process(Exchange exchange) throws Exception {
                     String pktdata = (String)exchange.getIn().getHeader("pktdata");
                     String name = (String)exchange.getIn().getHeader("name");
@@ -146,6 +146,7 @@ public class CamelConfiguration implements Configuration {
             };
 
             RouteBuilder httpRouteBuilder = new RouteBuilder() {
+                @Override
                 public void configure() {
                     from("jetty://http://" + httpHost + ":" + httpPort + "/" + httpPath) 
                     .threads()
