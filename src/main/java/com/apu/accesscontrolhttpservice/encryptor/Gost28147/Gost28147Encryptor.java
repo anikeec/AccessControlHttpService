@@ -19,13 +19,6 @@ public class Gost28147Encryptor implements Encryptor {
     private final String PROPERTIES_FILE_NAME = "security.properties";
     private final String SECUR_KEY_PROPERTY = "gost28147.key";
     
-    private void eraseAll() {
-        for(int i=0; i<data_buffer.length; i++)
-            data_buffer[i] = 0;
-    }
-    
-    int[] data_buffer = new int[4];
-    
     int[][] s_block = {
             {1,15,13,0,5,7,10,4,9,2,3,14,6,11,8,12},
             {13,11,4,1,3,15,5,9,0,10,14,7,6,8,2,12},
@@ -59,7 +52,7 @@ public class Gost28147Encryptor implements Encryptor {
     }
     
     /*------------------------------------------------------------------------*/
-    private void func_F1() {
+    private void func_F1(int[] data_buffer) {
         data_buffer[0]=(((s_block[6][data_buffer[0]>>4])<<4) + s_block[7][data_buffer[0] & 15]);
         data_buffer[1]=(((s_block[4][data_buffer[1]>>4])<<4) + s_block[5][data_buffer[1] & 15]);
         data_buffer[2]=(((s_block[2][data_buffer[2]>>4])<<4) + s_block[3][data_buffer[2] & 15]);
@@ -88,7 +81,7 @@ public class Gost28147Encryptor implements Encryptor {
     }
     
     /*------------------------------------------------------------------------*/
-    private void addc_4byteN1(Byte key_number, int[] buffer_N1) {
+    private void addc_4byteN1(Byte key_number, int[] buffer_N1, int[] data_buffer) {
         int ddd0=(buffer_N1[0] + k_block[key_number][0]);
         data_buffer[0]=(ddd0 & 255);
 
@@ -103,7 +96,7 @@ public class Gost28147Encryptor implements Encryptor {
     }    
     
     /*------------------------------------------------------------------------*/
-    private void addc_4byteN2(Byte key_number, int[] buffer_N2) {
+    private void addc_4byteN2(Byte key_number, int[] buffer_N2, int[] data_buffer) {
         int ddd0=(buffer_N2[0] + k_block[key_number][0]);
         data_buffer[0]=(ddd0 & 255);
 
@@ -118,7 +111,7 @@ public class Gost28147Encryptor implements Encryptor {
     }    
     
     /*------------------------------------------------------------------------*/
-    private void xor_4byteN1(int[] buffer_N1) {
+    private void xor_4byteN1(int[] buffer_N1, int[] data_buffer) {
         buffer_N1[0]=(buffer_N1[0] ^ data_buffer[0]);
         buffer_N1[1]=(buffer_N1[1] ^ data_buffer[1]);
         buffer_N1[2]=(buffer_N1[2] ^ data_buffer[2]);
@@ -126,7 +119,7 @@ public class Gost28147Encryptor implements Encryptor {
     }
     
     /*------------------------------------------------------------------------*/
-    private void xor_4byteN2(int[] buffer_N2) {
+    private void xor_4byteN2(int[] buffer_N2, int[] data_buffer) {
         buffer_N2[0]=(buffer_N2[0] ^ data_buffer[0]);
         buffer_N2[1]=(buffer_N2[1] ^ data_buffer[1]);
         buffer_N2[2]=(buffer_N2[2] ^ data_buffer[2]);
@@ -134,77 +127,78 @@ public class Gost28147Encryptor implements Encryptor {
     }
     
     /*------------------------------------------------------------------------*/
-    private void func01(Byte key_number, int[] buffer_N1, int[] buffer_N2) {
-        addc_4byteN1(key_number, buffer_N1);
-        func_F1();
-        xor_4byteN2(buffer_N2);
+    private void func01(Byte key_number, int[] buffer_N1, int[] buffer_N2, int[] data_buffer) {
+        addc_4byteN1(key_number, buffer_N1, data_buffer);
+        func_F1(data_buffer);
+        xor_4byteN2(buffer_N2, data_buffer);
     }
     
     /*------------------------------------------------------------------------*/
-    private void func02(Byte key_number, int[] buffer_N1, int[] buffer_N2) {
-        addc_4byteN2(key_number, buffer_N2);
-        func_F1();
-        xor_4byteN1(buffer_N1);
+    private void func02(Byte key_number, int[] buffer_N1, int[] buffer_N2, int[] data_buffer) {
+        addc_4byteN2(key_number, buffer_N2, data_buffer);
+        func_F1(data_buffer);
+        xor_4byteN1(buffer_N1, data_buffer);
     }
     
     /*------------------------------------------------------------------------*/
-    private void decrypt01234567(Byte key_number, int[] buffer_N1, int[] buffer_N2) {
+    private void decrypt01234567(Byte key_number, int[] buffer_N1, int[] buffer_N2, int[] data_buffer) {
         key_number=0;
 
-        func01(key_number, buffer_N1, buffer_N2);
+        func01(key_number, buffer_N1, buffer_N2, data_buffer);
         key_number++;
-        func02(key_number, buffer_N1, buffer_N2);
-        key_number++;
-
-        func01(key_number, buffer_N1, buffer_N2);
-        key_number++;
-        func02(key_number, buffer_N1, buffer_N2);
+        func02(key_number, buffer_N1, buffer_N2, data_buffer);
         key_number++;
 
-        func01(key_number, buffer_N1, buffer_N2);
+        func01(key_number, buffer_N1, buffer_N2, data_buffer);
         key_number++;
-        func02(key_number, buffer_N1, buffer_N2);
+        func02(key_number, buffer_N1, buffer_N2, data_buffer);
         key_number++;
 
-        func01(key_number, buffer_N1, buffer_N2);
+        func01(key_number, buffer_N1, buffer_N2, data_buffer);
         key_number++;
-        func02(key_number, buffer_N1, buffer_N2);
+        func02(key_number, buffer_N1, buffer_N2, data_buffer);
+        key_number++;
+
+        func01(key_number, buffer_N1, buffer_N2, data_buffer);
+        key_number++;
+        func02(key_number, buffer_N1, buffer_N2, data_buffer);
         key_number++;
     }
     
     /*------------------------------------------------------------------------*/
-    private void decrypt76543210(Byte key_number, int[] buffer_N1, int[] buffer_N2) {
+    private void decrypt76543210(Byte key_number, int[] buffer_N1, int[] buffer_N2, int[] data_buffer) {
         key_number=7;
 
-        func01(key_number, buffer_N1, buffer_N2);
+        func01(key_number, buffer_N1, buffer_N2, data_buffer);
         key_number--;
-        func02(key_number, buffer_N1, buffer_N2);
-        key_number--;
-
-        func01(key_number, buffer_N1, buffer_N2);
-        key_number--;
-        func02(key_number, buffer_N1, buffer_N2);
+        func02(key_number, buffer_N1, buffer_N2, data_buffer);
         key_number--;
 
-        func01(key_number, buffer_N1, buffer_N2);
+        func01(key_number, buffer_N1, buffer_N2, data_buffer);
         key_number--;
-        func02(key_number, buffer_N1, buffer_N2);
+        func02(key_number, buffer_N1, buffer_N2, data_buffer);
         key_number--;
 
-        func01(key_number, buffer_N1, buffer_N2);
+        func01(key_number, buffer_N1, buffer_N2, data_buffer);
         key_number--;
-        func02(key_number, buffer_N1, buffer_N2);
+        func02(key_number, buffer_N1, buffer_N2, data_buffer);
+        key_number--;
+
+        func01(key_number, buffer_N1, buffer_N2, data_buffer);
+        key_number--;
+        func02(key_number, buffer_N1, buffer_N2, data_buffer);
         key_number--;
     }
     
     /*------------------------------------------------------------------------*/
     private void gostEncode(int[] buffer_N1, int[] buffer_N2) {
         Byte key_number = new Byte((byte)0);
+        int[] data_buffer = new int[4];
         
-        decrypt01234567(key_number, buffer_N1, buffer_N2);
-        decrypt76543210(key_number, buffer_N1, buffer_N2);
-        decrypt76543210(key_number, buffer_N1, buffer_N2);
-        decrypt76543210(key_number, buffer_N1, buffer_N2);
+        decrypt01234567(key_number, buffer_N1, buffer_N2, data_buffer);
+        decrypt76543210(key_number, buffer_N1, buffer_N2, data_buffer);
+        decrypt76543210(key_number, buffer_N1, buffer_N2, data_buffer);
+        decrypt76543210(key_number, buffer_N1, buffer_N2, data_buffer);
 
         int ddd0=buffer_N1[0];
         int ddd1=buffer_N1[1];
@@ -225,11 +219,12 @@ public class Gost28147Encryptor implements Encryptor {
     /*------------------------------------------------------------------------*/
     private void gostDecode(int[] buffer_N1, int[] buffer_N2) {
         Byte key_number = new Byte((byte)0);
+        int[] data_buffer = new int[4];
         
-        decrypt01234567(key_number, buffer_N1, buffer_N2);
-        decrypt01234567(key_number, buffer_N1, buffer_N2);
-        decrypt01234567(key_number, buffer_N1, buffer_N2);
-        decrypt76543210(key_number, buffer_N1, buffer_N2);
+        decrypt01234567(key_number, buffer_N1, buffer_N2, data_buffer);
+        decrypt01234567(key_number, buffer_N1, buffer_N2, data_buffer);
+        decrypt01234567(key_number, buffer_N1, buffer_N2, data_buffer);
+        decrypt76543210(key_number, buffer_N1, buffer_N2, data_buffer);
         
         int ddd0 = buffer_N1[0];
         int ddd1 = buffer_N1[1];
@@ -251,7 +246,6 @@ public class Gost28147Encryptor implements Encryptor {
     public byte[] decode24bytesProcess(byte[] inputBytes) {
         if(inputBytes.length != 24)
             throw new IllegalArgumentException("Input message length incorrect.");
-        eraseAll();
         
         int[] buffer_N1 = new int[4];
         int[] buffer_N2 = new int[4];
@@ -330,7 +324,6 @@ public class Gost28147Encryptor implements Encryptor {
     public byte[] encode24bytesProcess(byte[] inputBytes) {
         if(inputBytes.length != 24)
             throw new IllegalArgumentException("Input message length incorrect.");
-        eraseAll();
         
         int[] buffer_N1 = new int[4];
         int[] buffer_N2 = new int[4];
