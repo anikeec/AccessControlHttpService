@@ -19,7 +19,7 @@ public class Gost28147Encryptor implements Encryptor {
     private final String PROPERTIES_FILE_NAME = "security.properties";
     private final String SECUR_KEY_PROPERTY = "gost28147.key";
     
-    int[][] s_block = {
+    int[][] sBlock = {
             {1,15,13,0,5,7,10,4,9,2,3,14,6,11,8,12},
             {13,11,4,1,3,15,5,9,0,10,14,7,6,8,2,12},
             {4,11,10,0,7,2,1,13,3,6,8,5,9,12,15,14},
@@ -30,7 +30,7 @@ public class Gost28147Encryptor implements Encryptor {
             {4,10,9,2,13,8,0,14,6,11,1,12,7,15,5,3}
     };
 
-    int[][] k_block = new int[8][4];
+    int[][] keyBlock = new int[8][4];
     
     /*------------------------------------------------------------------------*/
     public Gost28147Encryptor() {
@@ -46,17 +46,17 @@ public class Gost28147Encryptor implements Encryptor {
         int index = 0;
         for(int row=0; row<8; row++) {        
             for(int col=0; col<4; col++) {               
-                k_block[row][col] = ((int)keyBytes[index++]) & 0xFF;
+                keyBlock[row][col] = ((int)keyBytes[index++]) & 0xFF;
             }
         }
     }
     
     /*------------------------------------------------------------------------*/
-    private void func_F1(int[] data_buffer) {
-        data_buffer[0]=(((s_block[6][data_buffer[0]>>4])<<4) + s_block[7][data_buffer[0] & 15]);
-        data_buffer[1]=(((s_block[4][data_buffer[1]>>4])<<4) + s_block[5][data_buffer[1] & 15]);
-        data_buffer[2]=(((s_block[2][data_buffer[2]>>4])<<4) + s_block[3][data_buffer[2] & 15]);
-        data_buffer[3]=(((s_block[0][data_buffer[3]>>4])<<4) + s_block[1][data_buffer[3] & 15]);
+    private void funcF1(int[] data_buffer) {
+        data_buffer[0]=(((sBlock[6][data_buffer[0]>>4])<<4) + sBlock[7][data_buffer[0] & 15]);
+        data_buffer[1]=(((sBlock[4][data_buffer[1]>>4])<<4) + sBlock[5][data_buffer[1] & 15]);
+        data_buffer[2]=(((sBlock[2][data_buffer[2]>>4])<<4) + sBlock[3][data_buffer[2] & 15]);
+        data_buffer[3]=(((sBlock[0][data_buffer[3]>>4])<<4) + sBlock[1][data_buffer[3] & 15]);
 
         int rezerv_byte=data_buffer[3];
         data_buffer[3]=data_buffer[2];
@@ -81,37 +81,37 @@ public class Gost28147Encryptor implements Encryptor {
     }
     
     /*------------------------------------------------------------------------*/
-    private void addc_4byteN1(Byte key_number, int[] buffer_N1, int[] data_buffer) {
-        int ddd0=(buffer_N1[0] + k_block[key_number][0]);
+    private void addc4byteN1(Byte key_number, int[] buffer_N1, int[] data_buffer) {
+        int ddd0=(buffer_N1[0] + keyBlock[key_number][0]);
         data_buffer[0]=(ddd0 & 255);
 
-        int ddd1=(buffer_N1[1] + k_block[key_number][1] + (ddd0>>8));
+        int ddd1=(buffer_N1[1] + keyBlock[key_number][1] + (ddd0>>8));
         data_buffer[1]=(ddd1 & 255);
 
-        int ddd2=(buffer_N1[2] + k_block[key_number][2] + (ddd1>>8));
+        int ddd2=(buffer_N1[2] + keyBlock[key_number][2] + (ddd1>>8));
         data_buffer[2]=(ddd2 & 255);
 
-        int ddd3=(buffer_N1[3] + k_block[key_number][3] + (ddd2>>8));
+        int ddd3=(buffer_N1[3] + keyBlock[key_number][3] + (ddd2>>8));
         data_buffer[3]=(ddd3 & 255);
     }    
     
     /*------------------------------------------------------------------------*/
-    private void addc_4byteN2(Byte key_number, int[] buffer_N2, int[] data_buffer) {
-        int ddd0=(buffer_N2[0] + k_block[key_number][0]);
+    private void addc4byteN2(Byte key_number, int[] buffer_N2, int[] data_buffer) {
+        int ddd0=(buffer_N2[0] + keyBlock[key_number][0]);
         data_buffer[0]=(ddd0 & 255);
 
-        int ddd1=(buffer_N2[1] + k_block[key_number][1] + (ddd0>>8));
+        int ddd1=(buffer_N2[1] + keyBlock[key_number][1] + (ddd0>>8));
         data_buffer[1]=(ddd1 & 255);
 
-        int ddd2=(buffer_N2[2] + k_block[key_number][2] + (ddd1>>8));
+        int ddd2=(buffer_N2[2] + keyBlock[key_number][2] + (ddd1>>8));
         data_buffer[2]=(ddd2 & 255);
 
-        int ddd3=(buffer_N2[3] + k_block[key_number][3] + (ddd2>>8));
+        int ddd3=(buffer_N2[3] + keyBlock[key_number][3] + (ddd2>>8));
         data_buffer[3]=(ddd3 & 255);
     }    
     
     /*------------------------------------------------------------------------*/
-    private void xor_4byteN1(int[] buffer_N1, int[] data_buffer) {
+    private void xor4byteN1(int[] buffer_N1, int[] data_buffer) {
         buffer_N1[0]=(buffer_N1[0] ^ data_buffer[0]);
         buffer_N1[1]=(buffer_N1[1] ^ data_buffer[1]);
         buffer_N1[2]=(buffer_N1[2] ^ data_buffer[2]);
@@ -119,7 +119,7 @@ public class Gost28147Encryptor implements Encryptor {
     }
     
     /*------------------------------------------------------------------------*/
-    private void xor_4byteN2(int[] buffer_N2, int[] data_buffer) {
+    private void xor4byteN2(int[] buffer_N2, int[] data_buffer) {
         buffer_N2[0]=(buffer_N2[0] ^ data_buffer[0]);
         buffer_N2[1]=(buffer_N2[1] ^ data_buffer[1]);
         buffer_N2[2]=(buffer_N2[2] ^ data_buffer[2]);
@@ -128,16 +128,16 @@ public class Gost28147Encryptor implements Encryptor {
     
     /*------------------------------------------------------------------------*/
     private void func01(Byte key_number, int[] buffer_N1, int[] buffer_N2, int[] data_buffer) {
-        addc_4byteN1(key_number, buffer_N1, data_buffer);
-        func_F1(data_buffer);
-        xor_4byteN2(buffer_N2, data_buffer);
+        addc4byteN1(key_number, buffer_N1, data_buffer);
+        funcF1(data_buffer);
+        xor4byteN2(buffer_N2, data_buffer);
     }
     
     /*------------------------------------------------------------------------*/
     private void func02(Byte key_number, int[] buffer_N1, int[] buffer_N2, int[] data_buffer) {
-        addc_4byteN2(key_number, buffer_N2, data_buffer);
-        func_F1(data_buffer);
-        xor_4byteN1(buffer_N1, data_buffer);
+        addc4byteN2(key_number, buffer_N2, data_buffer);
+        funcF1(data_buffer);
+        xor4byteN1(buffer_N1, data_buffer);
     }
     
     /*------------------------------------------------------------------------*/
