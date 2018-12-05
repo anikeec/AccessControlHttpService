@@ -12,12 +12,14 @@ import org.apache.commons.codec.binary.Hex;
 
 /**
  *
- * @author apu
  */
 public class Gost28147Encryptor implements Encryptor {
     
     private final String PROPERTIES_FILE_NAME = "security.properties";
     private final String SECUR_KEY_PROPERTY = "gost28147.key";
+    private final int KEY_BLOCK_ROWS = 8;
+    private final int KEY_BLOCK_COLS = 4;
+    private final int HANDLING_BUF_SIZE = 24;
     
     int[][] sBlock = {
             {1,15,13,0,5,7,10,4,9,2,3,14,6,11,8,12},
@@ -30,7 +32,7 @@ public class Gost28147Encryptor implements Encryptor {
             {4,10,9,2,13,8,0,14,6,11,1,12,7,15,5,3}
     };
 
-    int[][] keyBlock = new int[8][4];
+    int[][] keyBlock = new int[KEY_BLOCK_ROWS][KEY_BLOCK_COLS];
     
     /*------------------------------------------------------------------------*/
     public Gost28147Encryptor() {
@@ -44,356 +46,356 @@ public class Gost28147Encryptor implements Encryptor {
                                                     SECUR_KEY_PROPERTY);
         byte[] keyBytes = DatatypeConverter.parseHexBinary(keyStr);
         int index = 0;
-        for(int row=0; row<8; row++) {        
-            for(int col=0; col<4; col++) {               
+        for(int row=0; row<KEY_BLOCK_ROWS; row++) {        
+            for(int col=0; col<KEY_BLOCK_COLS; col++) {               
                 keyBlock[row][col] = ((int)keyBytes[index++]) & 0xFF;
             }
         }
     }
     
     /*------------------------------------------------------------------------*/
-    private void funcF1(int[] data_buffer) {
-        data_buffer[0]=(((sBlock[6][data_buffer[0]>>4])<<4) + sBlock[7][data_buffer[0] & 15]);
-        data_buffer[1]=(((sBlock[4][data_buffer[1]>>4])<<4) + sBlock[5][data_buffer[1] & 15]);
-        data_buffer[2]=(((sBlock[2][data_buffer[2]>>4])<<4) + sBlock[3][data_buffer[2] & 15]);
-        data_buffer[3]=(((sBlock[0][data_buffer[3]>>4])<<4) + sBlock[1][data_buffer[3] & 15]);
+    private void funcF1(int[] dataBuffer) {
+        dataBuffer[0]=(((sBlock[6][dataBuffer[0]>>4])<<4) + sBlock[7][dataBuffer[0] & 15]);
+        dataBuffer[1]=(((sBlock[4][dataBuffer[1]>>4])<<4) + sBlock[5][dataBuffer[1] & 15]);
+        dataBuffer[2]=(((sBlock[2][dataBuffer[2]>>4])<<4) + sBlock[3][dataBuffer[2] & 15]);
+        dataBuffer[3]=(((sBlock[0][dataBuffer[3]>>4])<<4) + sBlock[1][dataBuffer[3] & 15]);
 
-        int rezerv_byte=data_buffer[3];
-        data_buffer[3]=data_buffer[2];
-        data_buffer[2]=data_buffer[1];
-        data_buffer[1]=data_buffer[0];
-        data_buffer[0]=rezerv_byte;
+        int rezerv_byte=dataBuffer[3];
+        dataBuffer[3]=dataBuffer[2];
+        dataBuffer[2]=dataBuffer[1];
+        dataBuffer[1]=dataBuffer[0];
+        dataBuffer[0]=rezerv_byte;
 
-        int ddd0=((data_buffer[0]<<3) & 248);
-        int ddd1=((data_buffer[1]<<3) & 248);
-        int ddd2=((data_buffer[2]<<3) & 248);
-        int ddd3=((data_buffer[3]<<3) & 248);
+        int ddd0=((dataBuffer[0]<<3) & 248);
+        int ddd1=((dataBuffer[1]<<3) & 248);
+        int ddd2=((dataBuffer[2]<<3) & 248);
+        int ddd3=((dataBuffer[3]<<3) & 248);
 
-        int ddt0=(data_buffer[0]>>5);
-        int ddt1=(data_buffer[1]>>5);
-        int ddt2=(data_buffer[2]>>5);
-        int ddt3=(data_buffer[3]>>5);
+        int ddt0=(dataBuffer[0]>>5);
+        int ddt1=(dataBuffer[1]>>5);
+        int ddt2=(dataBuffer[2]>>5);
+        int ddt3=(dataBuffer[3]>>5);
 
-        data_buffer[0]=(ddd0 + ddt3);
-        data_buffer[1]=(ddd1 + ddt0);
-        data_buffer[2]=(ddd2 + ddt1);
-        data_buffer[3]=(ddd3 + ddt2);
+        dataBuffer[0]=(ddd0 + ddt3);
+        dataBuffer[1]=(ddd1 + ddt0);
+        dataBuffer[2]=(ddd2 + ddt1);
+        dataBuffer[3]=(ddd3 + ddt2);
     }
     
     /*------------------------------------------------------------------------*/
-    private void addc4byteN1(Byte key_number, int[] buffer_N1, int[] data_buffer) {
-        int ddd0=(buffer_N1[0] + keyBlock[key_number][0]);
-        data_buffer[0]=(ddd0 & 255);
+    private void addc4byteN1(Byte keyNumber, int[] bufferN1, int[] dataBuffer) {
+        int ddd0=(bufferN1[0] + keyBlock[keyNumber][0]);
+        dataBuffer[0]=(ddd0 & 255);
 
-        int ddd1=(buffer_N1[1] + keyBlock[key_number][1] + (ddd0>>8));
-        data_buffer[1]=(ddd1 & 255);
+        int ddd1=(bufferN1[1] + keyBlock[keyNumber][1] + (ddd0>>8));
+        dataBuffer[1]=(ddd1 & 255);
 
-        int ddd2=(buffer_N1[2] + keyBlock[key_number][2] + (ddd1>>8));
-        data_buffer[2]=(ddd2 & 255);
+        int ddd2=(bufferN1[2] + keyBlock[keyNumber][2] + (ddd1>>8));
+        dataBuffer[2]=(ddd2 & 255);
 
-        int ddd3=(buffer_N1[3] + keyBlock[key_number][3] + (ddd2>>8));
-        data_buffer[3]=(ddd3 & 255);
+        int ddd3=(bufferN1[3] + keyBlock[keyNumber][3] + (ddd2>>8));
+        dataBuffer[3]=(ddd3 & 255);
     }    
     
     /*------------------------------------------------------------------------*/
-    private void addc4byteN2(Byte key_number, int[] buffer_N2, int[] data_buffer) {
-        int ddd0=(buffer_N2[0] + keyBlock[key_number][0]);
-        data_buffer[0]=(ddd0 & 255);
+    private void addc4byteN2(Byte keyNumber, int[] bufferN2, int[] dataBuffer) {
+        int ddd0=(bufferN2[0] + keyBlock[keyNumber][0]);
+        dataBuffer[0]=(ddd0 & 255);
 
-        int ddd1=(buffer_N2[1] + keyBlock[key_number][1] + (ddd0>>8));
-        data_buffer[1]=(ddd1 & 255);
+        int ddd1=(bufferN2[1] + keyBlock[keyNumber][1] + (ddd0>>8));
+        dataBuffer[1]=(ddd1 & 255);
 
-        int ddd2=(buffer_N2[2] + keyBlock[key_number][2] + (ddd1>>8));
-        data_buffer[2]=(ddd2 & 255);
+        int ddd2=(bufferN2[2] + keyBlock[keyNumber][2] + (ddd1>>8));
+        dataBuffer[2]=(ddd2 & 255);
 
-        int ddd3=(buffer_N2[3] + keyBlock[key_number][3] + (ddd2>>8));
-        data_buffer[3]=(ddd3 & 255);
+        int ddd3=(bufferN2[3] + keyBlock[keyNumber][3] + (ddd2>>8));
+        dataBuffer[3]=(ddd3 & 255);
     }    
     
     /*------------------------------------------------------------------------*/
-    private void xor4byteN1(int[] buffer_N1, int[] data_buffer) {
-        buffer_N1[0]=(buffer_N1[0] ^ data_buffer[0]);
-        buffer_N1[1]=(buffer_N1[1] ^ data_buffer[1]);
-        buffer_N1[2]=(buffer_N1[2] ^ data_buffer[2]);
-        buffer_N1[3]=(buffer_N1[3] ^ data_buffer[3]);
+    private void xor4byteN1(int[] bufferN1, int[] dataBuffer) {
+        bufferN1[0]=(bufferN1[0] ^ dataBuffer[0]);
+        bufferN1[1]=(bufferN1[1] ^ dataBuffer[1]);
+        bufferN1[2]=(bufferN1[2] ^ dataBuffer[2]);
+        bufferN1[3]=(bufferN1[3] ^ dataBuffer[3]);
     }
     
     /*------------------------------------------------------------------------*/
-    private void xor4byteN2(int[] buffer_N2, int[] data_buffer) {
-        buffer_N2[0]=(buffer_N2[0] ^ data_buffer[0]);
-        buffer_N2[1]=(buffer_N2[1] ^ data_buffer[1]);
-        buffer_N2[2]=(buffer_N2[2] ^ data_buffer[2]);
-        buffer_N2[3]=(buffer_N2[3] ^ data_buffer[3]);
+    private void xor4byteN2(int[] bufferN2, int[] dataBuffer) {
+        bufferN2[0]=(bufferN2[0] ^ dataBuffer[0]);
+        bufferN2[1]=(bufferN2[1] ^ dataBuffer[1]);
+        bufferN2[2]=(bufferN2[2] ^ dataBuffer[2]);
+        bufferN2[3]=(bufferN2[3] ^ dataBuffer[3]);
     }
     
     /*------------------------------------------------------------------------*/
-    private void func01(Byte key_number, int[] buffer_N1, int[] buffer_N2, int[] data_buffer) {
-        addc4byteN1(key_number, buffer_N1, data_buffer);
-        funcF1(data_buffer);
-        xor4byteN2(buffer_N2, data_buffer);
+    private void func01(Byte keyNumber, int[] bufferN1, int[] bufferN2, int[] dataBuffer) {
+        addc4byteN1(keyNumber, bufferN1, dataBuffer);
+        funcF1(dataBuffer);
+        xor4byteN2(bufferN2, dataBuffer);
     }
     
     /*------------------------------------------------------------------------*/
-    private void func02(Byte key_number, int[] buffer_N1, int[] buffer_N2, int[] data_buffer) {
-        addc4byteN2(key_number, buffer_N2, data_buffer);
-        funcF1(data_buffer);
-        xor4byteN1(buffer_N1, data_buffer);
+    private void func02(Byte keyNumber, int[] bufferN1, int[] bufferN2, int[] dataBuffer) {
+        addc4byteN2(keyNumber, bufferN2, dataBuffer);
+        funcF1(dataBuffer);
+        xor4byteN1(bufferN1, dataBuffer);
     }
     
     /*------------------------------------------------------------------------*/
-    private void decrypt01234567(Byte key_number, int[] buffer_N1, int[] buffer_N2, int[] data_buffer) {
-        key_number=0;
+    private void decrypt01234567(Byte keyNumber, int[] bufferN1, int[] bufferN2, int[] dataBuffer) {
+        keyNumber=0;
 
-        func01(key_number, buffer_N1, buffer_N2, data_buffer);
-        key_number++;
-        func02(key_number, buffer_N1, buffer_N2, data_buffer);
-        key_number++;
+        func01(keyNumber, bufferN1, bufferN2, dataBuffer);
+        keyNumber++;
+        func02(keyNumber, bufferN1, bufferN2, dataBuffer);
+        keyNumber++;
 
-        func01(key_number, buffer_N1, buffer_N2, data_buffer);
-        key_number++;
-        func02(key_number, buffer_N1, buffer_N2, data_buffer);
-        key_number++;
+        func01(keyNumber, bufferN1, bufferN2, dataBuffer);
+        keyNumber++;
+        func02(keyNumber, bufferN1, bufferN2, dataBuffer);
+        keyNumber++;
 
-        func01(key_number, buffer_N1, buffer_N2, data_buffer);
-        key_number++;
-        func02(key_number, buffer_N1, buffer_N2, data_buffer);
-        key_number++;
+        func01(keyNumber, bufferN1, bufferN2, dataBuffer);
+        keyNumber++;
+        func02(keyNumber, bufferN1, bufferN2, dataBuffer);
+        keyNumber++;
 
-        func01(key_number, buffer_N1, buffer_N2, data_buffer);
-        key_number++;
-        func02(key_number, buffer_N1, buffer_N2, data_buffer);
-        key_number++;
+        func01(keyNumber, bufferN1, bufferN2, dataBuffer);
+        keyNumber++;
+        func02(keyNumber, bufferN1, bufferN2, dataBuffer);
+        keyNumber++;
     }
     
     /*------------------------------------------------------------------------*/
-    private void decrypt76543210(Byte key_number, int[] buffer_N1, int[] buffer_N2, int[] data_buffer) {
-        key_number=7;
+    private void decrypt76543210(Byte keyNumber, int[] bufferN1, int[] bufferN2, int[] dataBuffer) {
+        keyNumber=7;
 
-        func01(key_number, buffer_N1, buffer_N2, data_buffer);
-        key_number--;
-        func02(key_number, buffer_N1, buffer_N2, data_buffer);
-        key_number--;
+        func01(keyNumber, bufferN1, bufferN2, dataBuffer);
+        keyNumber--;
+        func02(keyNumber, bufferN1, bufferN2, dataBuffer);
+        keyNumber--;
 
-        func01(key_number, buffer_N1, buffer_N2, data_buffer);
-        key_number--;
-        func02(key_number, buffer_N1, buffer_N2, data_buffer);
-        key_number--;
+        func01(keyNumber, bufferN1, bufferN2, dataBuffer);
+        keyNumber--;
+        func02(keyNumber, bufferN1, bufferN2, dataBuffer);
+        keyNumber--;
 
-        func01(key_number, buffer_N1, buffer_N2, data_buffer);
-        key_number--;
-        func02(key_number, buffer_N1, buffer_N2, data_buffer);
-        key_number--;
+        func01(keyNumber, bufferN1, bufferN2, dataBuffer);
+        keyNumber--;
+        func02(keyNumber, bufferN1, bufferN2, dataBuffer);
+        keyNumber--;
 
-        func01(key_number, buffer_N1, buffer_N2, data_buffer);
-        key_number--;
-        func02(key_number, buffer_N1, buffer_N2, data_buffer);
-        key_number--;
+        func01(keyNumber, bufferN1, bufferN2, dataBuffer);
+        keyNumber--;
+        func02(keyNumber, bufferN1, bufferN2, dataBuffer);
+        keyNumber--;
     }
     
     /*------------------------------------------------------------------------*/
-    private void gostEncode(int[] buffer_N1, int[] buffer_N2) {
-        Byte key_number = new Byte((byte)0);
-        int[] data_buffer = new int[4];
+    private void gostEncode(int[] bufferN1, int[] bufferN2) {
+        Byte keyNumber = new Byte((byte)0);
+        int[] dataBuffer = new int[4];
         
-        decrypt01234567(key_number, buffer_N1, buffer_N2, data_buffer);
-        decrypt76543210(key_number, buffer_N1, buffer_N2, data_buffer);
-        decrypt76543210(key_number, buffer_N1, buffer_N2, data_buffer);
-        decrypt76543210(key_number, buffer_N1, buffer_N2, data_buffer);
+        decrypt01234567(keyNumber, bufferN1, bufferN2, dataBuffer);
+        decrypt76543210(keyNumber, bufferN1, bufferN2, dataBuffer);
+        decrypt76543210(keyNumber, bufferN1, bufferN2, dataBuffer);
+        decrypt76543210(keyNumber, bufferN1, bufferN2, dataBuffer);
 
-        int ddd0=buffer_N1[0];
-        int ddd1=buffer_N1[1];
-        int ddd2=buffer_N1[2];
-        int ddd3=buffer_N1[3];
+        int ddd0=bufferN1[0];
+        int ddd1=bufferN1[1];
+        int ddd2=bufferN1[2];
+        int ddd3=bufferN1[3];
 
-        buffer_N1[0]=buffer_N2[0];
-        buffer_N1[1]=buffer_N2[1];
-        buffer_N1[2]=buffer_N2[2];
-        buffer_N1[3]=buffer_N2[3];
+        bufferN1[0]=bufferN2[0];
+        bufferN1[1]=bufferN2[1];
+        bufferN1[2]=bufferN2[2];
+        bufferN1[3]=bufferN2[3];
 
-        buffer_N2[0]=ddd0;
-        buffer_N2[1]=ddd1;
-        buffer_N2[2]=ddd2;
-        buffer_N2[3]=ddd3;
+        bufferN2[0]=ddd0;
+        bufferN2[1]=ddd1;
+        bufferN2[2]=ddd2;
+        bufferN2[3]=ddd3;
     }
     
     /*------------------------------------------------------------------------*/
-    private void gostDecode(int[] buffer_N1, int[] buffer_N2) {
-        Byte key_number = new Byte((byte)0);
-        int[] data_buffer = new int[4];
+    private void gostDecode(int[] bufferN1, int[] bufferN2) {
+        Byte keyNumber = new Byte((byte)0);
+        int[] dataBuffer = new int[4];
         
-        decrypt01234567(key_number, buffer_N1, buffer_N2, data_buffer);
-        decrypt01234567(key_number, buffer_N1, buffer_N2, data_buffer);
-        decrypt01234567(key_number, buffer_N1, buffer_N2, data_buffer);
-        decrypt76543210(key_number, buffer_N1, buffer_N2, data_buffer);
+        decrypt01234567(keyNumber, bufferN1, bufferN2, dataBuffer);
+        decrypt01234567(keyNumber, bufferN1, bufferN2, dataBuffer);
+        decrypt01234567(keyNumber, bufferN1, bufferN2, dataBuffer);
+        decrypt76543210(keyNumber, bufferN1, bufferN2, dataBuffer);
         
-        int ddd0 = buffer_N1[0];
-        int ddd1 = buffer_N1[1];
-        int ddd2 = buffer_N1[2];
-        int ddd3 = buffer_N1[3];
+        int ddd0 = bufferN1[0];
+        int ddd1 = bufferN1[1];
+        int ddd2 = bufferN1[2];
+        int ddd3 = bufferN1[3];
         
-        buffer_N1[0]=buffer_N2[0];
-        buffer_N1[1]=buffer_N2[1];
-        buffer_N1[2]=buffer_N2[2];
-        buffer_N1[3]=buffer_N2[3];
+        bufferN1[0]=bufferN2[0];
+        bufferN1[1]=bufferN2[1];
+        bufferN1[2]=bufferN2[2];
+        bufferN1[3]=bufferN2[3];
 
-        buffer_N2[0]=ddd0;
-        buffer_N2[1]=ddd1;
-        buffer_N2[2]=ddd2;
-        buffer_N2[3]=ddd3;
+        bufferN2[0]=ddd0;
+        bufferN2[1]=ddd1;
+        bufferN2[2]=ddd2;
+        bufferN2[3]=ddd3;
     }
     
     /*------------------------------------------------------------------------*/
     public byte[] decode24bytesProcess(byte[] inputBytes) {
-        if(inputBytes.length != 24)
+        if(inputBytes.length != HANDLING_BUF_SIZE)
             throw new IllegalArgumentException("Input message length incorrect.");
         
-        int[] buffer_N1 = new int[4];
-        int[] buffer_N2 = new int[4];
-        byte[] decodebuff = new byte[24];
+        int[] bufferN1 = new int[4];
+        int[] bufferN2 = new int[4];
+        byte[] decodebuff = new byte[HANDLING_BUF_SIZE];
         
-        buffer_N1[0]=((int)inputBytes[16])&0xFF;
-        buffer_N1[1]=((int)inputBytes[17])&0xFF;
-        buffer_N1[2]=((int)inputBytes[18])&0xFF;
-        buffer_N1[3]=((int)inputBytes[19])&0xFF;
-        buffer_N2[0]=((int)inputBytes[20])&0xFF;
-        buffer_N2[1]=((int)inputBytes[21])&0xFF;
-        buffer_N2[2]=((int)inputBytes[22])&0xFF;
-        buffer_N2[3]=((int)inputBytes[23])&0xFF;
+        bufferN1[0]=((int)inputBytes[16])&0xFF;
+        bufferN1[1]=((int)inputBytes[17])&0xFF;
+        bufferN1[2]=((int)inputBytes[18])&0xFF;
+        bufferN1[3]=((int)inputBytes[19])&0xFF;
+        bufferN2[0]=((int)inputBytes[20])&0xFF;
+        bufferN2[1]=((int)inputBytes[21])&0xFF;
+        bufferN2[2]=((int)inputBytes[22])&0xFF;
+        bufferN2[3]=((int)inputBytes[23])&0xFF;
         for(int i=0; i<4; i++) {
-            buffer_N1[i] &= 0xFF;
-            buffer_N2[i] &= 0xFF;
+            bufferN1[i] &= 0xFF;
+            bufferN2[i] &= 0xFF;
         }
-        gostDecode(buffer_N1, buffer_N2);
-        decodebuff[16]=(byte)buffer_N1[0];
-        decodebuff[17]=(byte)buffer_N1[1];
-        decodebuff[18]=(byte)buffer_N1[2];
-        decodebuff[19]=(byte)buffer_N1[3];
-        decodebuff[20]=(byte)buffer_N2[0];
-        decodebuff[21]=(byte)buffer_N2[1];
-        decodebuff[22]=(byte)buffer_N2[2];
-        decodebuff[23]=(byte)buffer_N2[3];
+        gostDecode(bufferN1, bufferN2);
+        decodebuff[16]=(byte)bufferN1[0];
+        decodebuff[17]=(byte)bufferN1[1];
+        decodebuff[18]=(byte)bufferN1[2];
+        decodebuff[19]=(byte)bufferN1[3];
+        decodebuff[20]=(byte)bufferN2[0];
+        decodebuff[21]=(byte)bufferN2[1];
+        decodebuff[22]=(byte)bufferN2[2];
+        decodebuff[23]=(byte)bufferN2[3];
 
-        buffer_N1[0]=((int)inputBytes[8])&0xFF;
-        buffer_N1[1]=((int)inputBytes[9])&0xFF;
-        buffer_N1[2]=((int)inputBytes[10])&0xFF;
-        buffer_N1[3]=((int)inputBytes[11])&0xFF;
-        buffer_N2[0]=((int)inputBytes[12])&0xFF;
-        buffer_N2[1]=((int)inputBytes[13])&0xFF;
-        buffer_N2[2]=((int)inputBytes[14])&0xFF;
-        buffer_N2[3]=((int)inputBytes[15])&0xFF;
+        bufferN1[0]=((int)inputBytes[8])&0xFF;
+        bufferN1[1]=((int)inputBytes[9])&0xFF;
+        bufferN1[2]=((int)inputBytes[10])&0xFF;
+        bufferN1[3]=((int)inputBytes[11])&0xFF;
+        bufferN2[0]=((int)inputBytes[12])&0xFF;
+        bufferN2[1]=((int)inputBytes[13])&0xFF;
+        bufferN2[2]=((int)inputBytes[14])&0xFF;
+        bufferN2[3]=((int)inputBytes[15])&0xFF;
         for(int i=0; i<4; i++) {
-            buffer_N1[i] &= 0xFF;
-            buffer_N2[i] &= 0xFF;
+            bufferN1[i] &= 0xFF;
+            bufferN2[i] &= 0xFF;
         }
-        gostDecode(buffer_N1, buffer_N2);
-        decodebuff[8]=(byte)(buffer_N1[0]^(((int)inputBytes[16])&0xFF));
-        decodebuff[9]=(byte)(buffer_N1[1]^(((int)inputBytes[17])&0xFF));
-        decodebuff[10]=(byte)(buffer_N1[2]^(((int)inputBytes[18])&0xFF));
-        decodebuff[11]=(byte)(buffer_N1[3]^(((int)inputBytes[19])&0xFF));
-        decodebuff[12]=(byte)(buffer_N2[0]^(((int)inputBytes[20])&0xFF));
-        decodebuff[13]=(byte)(buffer_N2[1]^(((int)inputBytes[21])&0xFF));
-        decodebuff[14]=(byte)(buffer_N2[2]^(((int)inputBytes[22])&0xFF));
-        decodebuff[15]=(byte)(buffer_N2[3]^(((int)inputBytes[23])&0xFF));
+        gostDecode(bufferN1, bufferN2);
+        decodebuff[8]=(byte)(bufferN1[0]^(((int)inputBytes[16])&0xFF));
+        decodebuff[9]=(byte)(bufferN1[1]^(((int)inputBytes[17])&0xFF));
+        decodebuff[10]=(byte)(bufferN1[2]^(((int)inputBytes[18])&0xFF));
+        decodebuff[11]=(byte)(bufferN1[3]^(((int)inputBytes[19])&0xFF));
+        decodebuff[12]=(byte)(bufferN2[0]^(((int)inputBytes[20])&0xFF));
+        decodebuff[13]=(byte)(bufferN2[1]^(((int)inputBytes[21])&0xFF));
+        decodebuff[14]=(byte)(bufferN2[2]^(((int)inputBytes[22])&0xFF));
+        decodebuff[15]=(byte)(bufferN2[3]^(((int)inputBytes[23])&0xFF));
 
-        buffer_N1[0]=((int)inputBytes[0]&0xFF);
-        buffer_N1[1]=((int)inputBytes[1]&0xFF);
-        buffer_N1[2]=((int)inputBytes[2]&0xFF);
-        buffer_N1[3]=((int)inputBytes[3]&0xFF);
-        buffer_N2[0]=((int)inputBytes[4]&0xFF);
-        buffer_N2[1]=((int)inputBytes[5]&0xFF);
-        buffer_N2[2]=((int)inputBytes[6]&0xFF);
-        buffer_N2[3]=((int)inputBytes[7]&0xFF);
+        bufferN1[0]=((int)inputBytes[0]&0xFF);
+        bufferN1[1]=((int)inputBytes[1]&0xFF);
+        bufferN1[2]=((int)inputBytes[2]&0xFF);
+        bufferN1[3]=((int)inputBytes[3]&0xFF);
+        bufferN2[0]=((int)inputBytes[4]&0xFF);
+        bufferN2[1]=((int)inputBytes[5]&0xFF);
+        bufferN2[2]=((int)inputBytes[6]&0xFF);
+        bufferN2[3]=((int)inputBytes[7]&0xFF);
         for(int i=0; i<4; i++) {
-            buffer_N1[i] &= 0xFF;
-            buffer_N2[i] &= 0xFF;
+            bufferN1[i] &= 0xFF;
+            bufferN2[i] &= 0xFF;
         }
-        gostDecode(buffer_N1, buffer_N2);
-        decodebuff[0]=(byte)(buffer_N1[0]^inputBytes[16]);
-        decodebuff[1]=(byte)(buffer_N1[1]^inputBytes[17]);
-        decodebuff[2]=(byte)(buffer_N1[2]^inputBytes[18]);
-        decodebuff[3]=(byte)(buffer_N1[3]^inputBytes[19]);
-        decodebuff[4]=(byte)(buffer_N2[0]^inputBytes[20]);
-        decodebuff[5]=(byte)(buffer_N2[1]^inputBytes[21]);
-        decodebuff[6]=(byte)(buffer_N2[2]^inputBytes[22]);
-        decodebuff[7]=(byte)(buffer_N2[3]^inputBytes[23]);
+        gostDecode(bufferN1, bufferN2);
+        decodebuff[0]=(byte)(bufferN1[0]^inputBytes[16]);
+        decodebuff[1]=(byte)(bufferN1[1]^inputBytes[17]);
+        decodebuff[2]=(byte)(bufferN1[2]^inputBytes[18]);
+        decodebuff[3]=(byte)(bufferN1[3]^inputBytes[19]);
+        decodebuff[4]=(byte)(bufferN2[0]^inputBytes[20]);
+        decodebuff[5]=(byte)(bufferN2[1]^inputBytes[21]);
+        decodebuff[6]=(byte)(bufferN2[2]^inputBytes[22]);
+        decodebuff[7]=(byte)(bufferN2[3]^inputBytes[23]);
         
         return decodebuff;
     }
     
     /*------------------------------------------------------------------------*/
     public byte[] encode24bytesProcess(byte[] inputBytes) {
-        if(inputBytes.length != 24)
+        if(inputBytes.length != HANDLING_BUF_SIZE)
             throw new IllegalArgumentException("Input message length incorrect.");
         
-        int[] buffer_N1 = new int[4];
-        int[] buffer_N2 = new int[4];
-        byte[] decodebuff = new byte[24];
+        int[] bufferN1 = new int[4];
+        int[] bufferN2 = new int[4];
+        byte[] decodebuff = new byte[HANDLING_BUF_SIZE];
         
-        buffer_N1[0]=((int)inputBytes[16]&0xFF);
-        buffer_N1[1]=((int)inputBytes[17]&0xFF);
-        buffer_N1[2]=((int)inputBytes[18]&0xFF);
-        buffer_N1[3]=((int)inputBytes[19]&0xFF);
-        buffer_N2[0]=((int)inputBytes[20]&0xFF);
-        buffer_N2[1]=((int)inputBytes[21]&0xFF);
-        buffer_N2[2]=((int)inputBytes[22]&0xFF);
-        buffer_N2[3]=((int)inputBytes[23]&0xFF);
+        bufferN1[0]=((int)inputBytes[16]&0xFF);
+        bufferN1[1]=((int)inputBytes[17]&0xFF);
+        bufferN1[2]=((int)inputBytes[18]&0xFF);
+        bufferN1[3]=((int)inputBytes[19]&0xFF);
+        bufferN2[0]=((int)inputBytes[20]&0xFF);
+        bufferN2[1]=((int)inputBytes[21]&0xFF);
+        bufferN2[2]=((int)inputBytes[22]&0xFF);
+        bufferN2[3]=((int)inputBytes[23]&0xFF);
         for(int i=0; i<4; i++) {
-            buffer_N1[i] &= 0xFF;
-            buffer_N2[i] &= 0xFF;
+            bufferN1[i] &= 0xFF;
+            bufferN2[i] &= 0xFF;
         }
-        gostEncode(buffer_N1, buffer_N2);
-        decodebuff[16]=(byte)buffer_N1[0];
-        decodebuff[17]=(byte)buffer_N1[1];
-        decodebuff[18]=(byte)buffer_N1[2];
-        decodebuff[19]=(byte)buffer_N1[3];
-        decodebuff[20]=(byte)buffer_N2[0];
-        decodebuff[21]=(byte)buffer_N2[1];
-        decodebuff[22]=(byte)buffer_N2[2];
-        decodebuff[23]=(byte)buffer_N2[3];
+        gostEncode(bufferN1, bufferN2);
+        decodebuff[16]=(byte)bufferN1[0];
+        decodebuff[17]=(byte)bufferN1[1];
+        decodebuff[18]=(byte)bufferN1[2];
+        decodebuff[19]=(byte)bufferN1[3];
+        decodebuff[20]=(byte)bufferN2[0];
+        decodebuff[21]=(byte)bufferN2[1];
+        decodebuff[22]=(byte)bufferN2[2];
+        decodebuff[23]=(byte)bufferN2[3];
 
-        buffer_N1[0]=((int)inputBytes[8]^decodebuff[16]);
-        buffer_N1[1]=((int)inputBytes[9]^decodebuff[17]);
-        buffer_N1[2]=((int)inputBytes[10]^decodebuff[18]);
-        buffer_N1[3]=((int)inputBytes[11]^decodebuff[19]);
-        buffer_N2[0]=((int)inputBytes[12]^decodebuff[20]);
-        buffer_N2[1]=((int)inputBytes[13]^decodebuff[21]);
-        buffer_N2[2]=((int)inputBytes[14]^decodebuff[22]);
-        buffer_N2[3]=((int)inputBytes[15]^decodebuff[23]);
+        bufferN1[0]=((int)inputBytes[8]^decodebuff[16]);
+        bufferN1[1]=((int)inputBytes[9]^decodebuff[17]);
+        bufferN1[2]=((int)inputBytes[10]^decodebuff[18]);
+        bufferN1[3]=((int)inputBytes[11]^decodebuff[19]);
+        bufferN2[0]=((int)inputBytes[12]^decodebuff[20]);
+        bufferN2[1]=((int)inputBytes[13]^decodebuff[21]);
+        bufferN2[2]=((int)inputBytes[14]^decodebuff[22]);
+        bufferN2[3]=((int)inputBytes[15]^decodebuff[23]);
         for(int i=0; i<4; i++) {
-            buffer_N1[i] &= 0xFF;
-            buffer_N2[i] &= 0xFF;
+            bufferN1[i] &= 0xFF;
+            bufferN2[i] &= 0xFF;
         }
-        gostEncode(buffer_N1, buffer_N2);
-        decodebuff[8]=(byte)(buffer_N1[0]);
-        decodebuff[9]=(byte)(buffer_N1[1]);
-        decodebuff[10]=(byte)(buffer_N1[2]);
-        decodebuff[11]=(byte)(buffer_N1[3]);
-        decodebuff[12]=(byte)(buffer_N2[0]);
-        decodebuff[13]=(byte)(buffer_N2[1]);
-        decodebuff[14]=(byte)(buffer_N2[2]);
-        decodebuff[15]=(byte)(buffer_N2[3]);
+        gostEncode(bufferN1, bufferN2);
+        decodebuff[8]=(byte)(bufferN1[0]);
+        decodebuff[9]=(byte)(bufferN1[1]);
+        decodebuff[10]=(byte)(bufferN1[2]);
+        decodebuff[11]=(byte)(bufferN1[3]);
+        decodebuff[12]=(byte)(bufferN2[0]);
+        decodebuff[13]=(byte)(bufferN2[1]);
+        decodebuff[14]=(byte)(bufferN2[2]);
+        decodebuff[15]=(byte)(bufferN2[3]);
 
-        buffer_N1[0]=((int)inputBytes[0]^decodebuff[16]);
-        buffer_N1[1]=((int)inputBytes[1]^decodebuff[17]);
-        buffer_N1[2]=((int)inputBytes[2]^decodebuff[18]);
-        buffer_N1[3]=((int)inputBytes[3]^decodebuff[19]);
-        buffer_N2[0]=((int)inputBytes[4]^decodebuff[20]);
-        buffer_N2[1]=((int)inputBytes[5]^decodebuff[21]);
-        buffer_N2[2]=((int)inputBytes[6]^decodebuff[22]);
-        buffer_N2[3]=((int)inputBytes[7]^decodebuff[23]);
+        bufferN1[0]=((int)inputBytes[0]^decodebuff[16]);
+        bufferN1[1]=((int)inputBytes[1]^decodebuff[17]);
+        bufferN1[2]=((int)inputBytes[2]^decodebuff[18]);
+        bufferN1[3]=((int)inputBytes[3]^decodebuff[19]);
+        bufferN2[0]=((int)inputBytes[4]^decodebuff[20]);
+        bufferN2[1]=((int)inputBytes[5]^decodebuff[21]);
+        bufferN2[2]=((int)inputBytes[6]^decodebuff[22]);
+        bufferN2[3]=((int)inputBytes[7]^decodebuff[23]);
         for(int i=0; i<4; i++) {
-            buffer_N1[i] &= 0xFF;
-            buffer_N2[i] &= 0xFF;
+            bufferN1[i] &= 0xFF;
+            bufferN2[i] &= 0xFF;
         }
-        gostEncode(buffer_N1, buffer_N2);
-        decodebuff[0]=(byte)(buffer_N1[0]);
-        decodebuff[1]=(byte)(buffer_N1[1]);
-        decodebuff[2]=(byte)(buffer_N1[2]);
-        decodebuff[3]=(byte)(buffer_N1[3]);
-        decodebuff[4]=(byte)(buffer_N2[0]);
-        decodebuff[5]=(byte)(buffer_N2[1]);
-        decodebuff[6]=(byte)(buffer_N2[2]);
-        decodebuff[7]=(byte)(buffer_N2[3]);
+        gostEncode(bufferN1, bufferN2);
+        decodebuff[0]=(byte)(bufferN1[0]);
+        decodebuff[1]=(byte)(bufferN1[1]);
+        decodebuff[2]=(byte)(bufferN1[2]);
+        decodebuff[3]=(byte)(bufferN1[3]);
+        decodebuff[4]=(byte)(bufferN2[0]);
+        decodebuff[5]=(byte)(bufferN2[1]);
+        decodebuff[6]=(byte)(bufferN2[2]);
+        decodebuff[7]=(byte)(bufferN2[3]);
         
         return decodebuff;
     }
