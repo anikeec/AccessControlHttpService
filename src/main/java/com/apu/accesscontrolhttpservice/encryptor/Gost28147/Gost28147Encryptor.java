@@ -490,7 +490,7 @@ public class Gost28147Encryptor implements Encryptor {
         
         int crc16 = 0;
         for(int i=0; i<HANDLING_BUF_SIZE; i++) {
-            int temp = (crc16 & 0xFF) ^ ((int)buffer[i]&0xFF);
+            int temp = (crc16 & BYTE_MASK) ^ ((int)buffer[i] & BYTE_MASK);
             crc16 = (crc16 >> 8) ^ crc16Array[temp];
         }
         
