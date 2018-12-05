@@ -245,23 +245,32 @@ public class Gost28147Encryptor implements Encryptor {
         bufferN2[3]=ddd3;
     }
     
+    private int[] byteBuf2IntBuf(byte[] bytes) {
+        int[] result = new int[bytes.length];
+        for(int i=0; i<bytes.length; i++) {
+            result[i] = ((int)bytes[i]) & BYTE_MASK;
+        }
+        return result;
+    }
+    
     /*------------------------------------------------------------------------*/
-    public byte[] decode24bytesProcess(byte[] inputBytes) {
-        if(inputBytes.length != HANDLING_BUF_SIZE)
+    public byte[] decode24bytesProcess(byte[] input) {
+        if(input.length != HANDLING_BUF_SIZE)
             throw new IllegalArgumentException("Input message length incorrect.");
         
         int[] bufferN1 = new int[4];
         int[] bufferN2 = new int[4];
         byte[] decodebuff = new byte[HANDLING_BUF_SIZE];
+        int[] inputBytes = byteBuf2IntBuf(input);
         
-        bufferN1[0]=((int)inputBytes[16]) & BYTE_MASK;
-        bufferN1[1]=((int)inputBytes[17]) & BYTE_MASK;
-        bufferN1[2]=((int)inputBytes[18]) & BYTE_MASK;
-        bufferN1[3]=((int)inputBytes[19]) & BYTE_MASK;
-        bufferN2[0]=((int)inputBytes[20]) & BYTE_MASK;
-        bufferN2[1]=((int)inputBytes[21]) & BYTE_MASK;
-        bufferN2[2]=((int)inputBytes[22]) & BYTE_MASK;
-        bufferN2[3]=((int)inputBytes[23]) & BYTE_MASK;
+        bufferN1[0]=inputBytes[16];
+        bufferN1[1]=inputBytes[17];
+        bufferN1[2]=inputBytes[18];
+        bufferN1[3]=inputBytes[19];
+        bufferN2[0]=inputBytes[20];
+        bufferN2[1]=inputBytes[21];
+        bufferN2[2]=inputBytes[22];
+        bufferN2[3]=inputBytes[23];
         for(int i=0; i<4; i++) {
             bufferN1[i] &= BYTE_MASK;
             bufferN2[i] &= BYTE_MASK;
@@ -276,36 +285,36 @@ public class Gost28147Encryptor implements Encryptor {
         decodebuff[22]=(byte)bufferN2[2];
         decodebuff[23]=(byte)bufferN2[3];
 
-        bufferN1[0]=((int)inputBytes[8]) & BYTE_MASK;
-        bufferN1[1]=((int)inputBytes[9]) & BYTE_MASK;
-        bufferN1[2]=((int)inputBytes[10]) & BYTE_MASK;
-        bufferN1[3]=((int)inputBytes[11]) & BYTE_MASK;
-        bufferN2[0]=((int)inputBytes[12]) & BYTE_MASK;
-        bufferN2[1]=((int)inputBytes[13]) & BYTE_MASK;
-        bufferN2[2]=((int)inputBytes[14]) & BYTE_MASK;
-        bufferN2[3]=((int)inputBytes[15]) & BYTE_MASK;
+        bufferN1[0]=inputBytes[8];
+        bufferN1[1]=inputBytes[9];
+        bufferN1[2]=inputBytes[10];
+        bufferN1[3]=inputBytes[11];
+        bufferN2[0]=inputBytes[12];
+        bufferN2[1]=inputBytes[13];
+        bufferN2[2]=inputBytes[14];
+        bufferN2[3]=inputBytes[15];
         for(int i=0; i<4; i++) {
             bufferN1[i] &= BYTE_MASK;
             bufferN2[i] &= BYTE_MASK;
         }
         gostDecode(bufferN1, bufferN2);
-        decodebuff[8]=(byte)(bufferN1[0]^(((int)inputBytes[16]) & BYTE_MASK));
-        decodebuff[9]=(byte)(bufferN1[1]^(((int)inputBytes[17]) & BYTE_MASK));
-        decodebuff[10]=(byte)(bufferN1[2]^(((int)inputBytes[18]) & BYTE_MASK));
-        decodebuff[11]=(byte)(bufferN1[3]^(((int)inputBytes[19]) & BYTE_MASK));
-        decodebuff[12]=(byte)(bufferN2[0]^(((int)inputBytes[20]) & BYTE_MASK));
-        decodebuff[13]=(byte)(bufferN2[1]^(((int)inputBytes[21]) & BYTE_MASK));
-        decodebuff[14]=(byte)(bufferN2[2]^(((int)inputBytes[22]) & BYTE_MASK));
-        decodebuff[15]=(byte)(bufferN2[3]^(((int)inputBytes[23]) & BYTE_MASK));
+        decodebuff[8]=(byte)(bufferN1[0]^inputBytes[16]);
+        decodebuff[9]=(byte)(bufferN1[1]^inputBytes[17]);
+        decodebuff[10]=(byte)(bufferN1[2]^inputBytes[18]);
+        decodebuff[11]=(byte)(bufferN1[3]^inputBytes[19]);
+        decodebuff[12]=(byte)(bufferN2[0]^inputBytes[20]);
+        decodebuff[13]=(byte)(bufferN2[1]^inputBytes[21]);
+        decodebuff[14]=(byte)(bufferN2[2]^inputBytes[22]);
+        decodebuff[15]=(byte)(bufferN2[3]^inputBytes[23]);
 
-        bufferN1[0]=((int)inputBytes[0] & BYTE_MASK);
-        bufferN1[1]=((int)inputBytes[1] & BYTE_MASK);
-        bufferN1[2]=((int)inputBytes[2] & BYTE_MASK);
-        bufferN1[3]=((int)inputBytes[3] & BYTE_MASK);
-        bufferN2[0]=((int)inputBytes[4] & BYTE_MASK);
-        bufferN2[1]=((int)inputBytes[5] & BYTE_MASK);
-        bufferN2[2]=((int)inputBytes[6] & BYTE_MASK);
-        bufferN2[3]=((int)inputBytes[7] & BYTE_MASK);
+        bufferN1[0]=inputBytes[0];
+        bufferN1[1]=inputBytes[1];
+        bufferN1[2]=inputBytes[2];
+        bufferN1[3]=inputBytes[3];
+        bufferN2[0]=inputBytes[4];
+        bufferN2[1]=inputBytes[5];
+        bufferN2[2]=inputBytes[6];
+        bufferN2[3]=inputBytes[7];
         for(int i=0; i<4; i++) {
             bufferN1[i] &= BYTE_MASK;
             bufferN2[i] &= BYTE_MASK;
