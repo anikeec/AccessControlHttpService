@@ -47,7 +47,7 @@ public class CamelConfiguration implements Configuration {
         encryptor = new Gost28147Encryptor();
         parser = new SntParser();
         serializer = new GsonJsonSerializer();
-        httpHost = "localhost";
+        httpHost = "0.0.0.0";
         httpPort = 65532;
         httpPath = "add.php";
         tcpHost = "localhost";
