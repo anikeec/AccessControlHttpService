@@ -60,11 +60,11 @@ public class Gost28147EncryptorTest {
     @Test
     public void testDecryptProcess() {
         System.out.println("decryptProcess");
-        String inputStr = encoded;
         Gost28147Encryptor instance = new Gost28147Encryptor();
-        String expResult = decoded;
-        String result = instance.decodeProcess(inputStr);
-        assertTrue(expResult.equalsIgnoreCase(result));
+        byte[] inputBytes = DatatypeConverter.parseHexBinary(encoded);
+        byte[] expResult = DatatypeConverter.parseHexBinary(decoded);        
+        byte[] result = instance.decodeProcess(inputBytes);
+        assertArrayEquals(expResult, result);
     }
     
 }
