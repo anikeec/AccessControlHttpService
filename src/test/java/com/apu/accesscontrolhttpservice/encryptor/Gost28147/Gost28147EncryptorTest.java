@@ -50,7 +50,7 @@ public class Gost28147EncryptorTest {
         String inputStr = decoded;
         Gost28147Encryptor instance = new Gost28147Encryptor();
         String expResult = encoded;
-        String result = instance.decryptProcess(inputStr);
+        String result = instance.encodeProcess(inputStr);
         assertTrue(expResult.equalsIgnoreCase(result));
     }
 
@@ -63,7 +63,7 @@ public class Gost28147EncryptorTest {
         String inputStr = encoded;
         Gost28147Encryptor instance = new Gost28147Encryptor();
         String expResult = decoded;
-        String result = instance.cryptProcess(true, inputStr);
+        String result = instance.decodeProcess(inputStr);
         assertTrue(expResult.equalsIgnoreCase(result));
     }
     

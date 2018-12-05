@@ -5,14 +5,8 @@
  */
 package com.apu.accesscontrolhttpservice.encryptor.Gost28147;
 
+import com.apu.accesscontrolhttpservice.encryptor.Encryptor;
 import com.apu.accesscontrolhttpservice.utils.PropertyLoader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.codec.binary.Hex;
 
@@ -20,9 +14,9 @@ import org.apache.commons.codec.binary.Hex;
  *
  * @author apu
  */
-public class Gost28147Encryptor {
+public class Gost28147Encryptor implements Encryptor {
     
-    private final String PROPERTIES_FILE_NAME = "./security.properties";
+    private final String PROPERTIES_FILE_NAME = "security.properties";
     private final String SECUR_KEY_PROPERTY = "gost28147.key";
     
     private void eraseAll() {
@@ -220,7 +214,7 @@ public class Gost28147Encryptor {
     }
     
     /*------------------------------------------------------------------------*/
-    private void gostdecrypt() {
+    private void gostEncode() {
         decrypt01234567();
         decrypt76543210();
         decrypt76543210();
@@ -243,7 +237,7 @@ public class Gost28147Encryptor {
     }
     
     /*------------------------------------------------------------------------*/
-    private void gostcrypt() {
+    private void gostDecode() {
         
         decrypt01234567();
         decrypt01234567();
@@ -267,7 +261,7 @@ public class Gost28147Encryptor {
     }
     
     /*------------------------------------------------------------------------*/
-    public String cryptProcess(boolean cryptDecrypt, String inputStr) {
+    public String decodeProcess(String inputStr) {
         if(inputStr.length() != 48)
             throw new IllegalArgumentException("Input message length incorrect.");
         eraseAll();
@@ -286,10 +280,7 @@ public class Gost28147Encryptor {
             buffer_N1[i] &= 0xFF;
             buffer_N2[i] &= 0xFF;
         }
-        if(cryptDecrypt)
-            gostcrypt();
-        else 
-            gostdecrypt();
+        gostDecode();
         decodebuff[16]=(byte)buffer_N1[0];
         decodebuff[17]=(byte)buffer_N1[1];
         decodebuff[18]=(byte)buffer_N1[2];
@@ -311,10 +302,7 @@ public class Gost28147Encryptor {
             buffer_N1[i] &= 0xFF;
             buffer_N2[i] &= 0xFF;
         }
-        if(cryptDecrypt)
-            gostcrypt();
-        else 
-            gostdecrypt();
+        gostDecode();
         decodebuff[8]=(byte)(buffer_N1[0]^(((int)allbuff[16])&0xFF));
         decodebuff[9]=(byte)(buffer_N1[1]^(((int)allbuff[17])&0xFF));
         decodebuff[10]=(byte)(buffer_N1[2]^(((int)allbuff[18])&0xFF));
@@ -336,10 +324,7 @@ public class Gost28147Encryptor {
             buffer_N1[i] &= 0xFF;
             buffer_N2[i] &= 0xFF;
         }
-        if(cryptDecrypt)
-            gostcrypt();
-        else 
-            gostdecrypt();
+        gostDecode();
         decodebuff[0]=(byte)(buffer_N1[0]^allbuff[16]);
         decodebuff[1]=(byte)(buffer_N1[1]^allbuff[17]);
         decodebuff[2]=(byte)(buffer_N1[2]^allbuff[18]);
@@ -353,7 +338,7 @@ public class Gost28147Encryptor {
     }
     
     /*------------------------------------------------------------------------*/
-    public String decryptProcess(String inputStr) {
+    public String encodeProcess(String inputStr) {
         if(inputStr.length() != 48)
             throw new IllegalArgumentException("Input message length incorrect.");
         eraseAll();
@@ -372,7 +357,7 @@ public class Gost28147Encryptor {
             buffer_N1[i] &= 0xFF;
             buffer_N2[i] &= 0xFF;
         }
-            gostdecrypt();
+        gostEncode();
         decodebuff[16]=(byte)buffer_N1[0];
         decodebuff[17]=(byte)buffer_N1[1];
         decodebuff[18]=(byte)buffer_N1[2];
@@ -394,7 +379,7 @@ public class Gost28147Encryptor {
             buffer_N1[i] &= 0xFF;
             buffer_N2[i] &= 0xFF;
         }
-            gostdecrypt();
+        gostEncode();
         decodebuff[8]=(byte)(buffer_N1[0]);
         decodebuff[9]=(byte)(buffer_N1[1]);
         decodebuff[10]=(byte)(buffer_N1[2]);
@@ -416,7 +401,7 @@ public class Gost28147Encryptor {
             buffer_N1[i] &= 0xFF;
             buffer_N2[i] &= 0xFF;
         }
-            gostdecrypt();
+        gostEncode();
         decodebuff[0]=(byte)(buffer_N1[0]);
         decodebuff[1]=(byte)(buffer_N1[1]);
         decodebuff[2]=(byte)(buffer_N1[2]);
@@ -435,18 +420,37 @@ public class Gost28147Encryptor {
         
         String source = "F0B1C9224826CEC1E6C049EBC3242A9DA8EA0FA086FE6805";
         result = 
-           encryptor.cryptProcess(true, source);
+           encryptor.decodeProcess(source);
         System.out.println("Encrypt");
         System.out.println("src: " + source);
         System.out.println("res: " + result);
         
         source = result;
         result = 
-           encryptor.decryptProcess(source);
+           encryptor.encodeProcess(source);
         System.out.println("Decrypt");
         System.out.println("src: " + source);
-        System.out.println("res: " + result);
- 
+        System.out.println("res: " + result); 
+    }
+
+    @Override
+    public String decode(String str) {
+        return this.decodeProcess(str);
+    }
+
+    @Override
+    public byte[] decode(byte[] str) {
+        throw new UnsupportedOperationException("Not supported yet."); 
+    }
+
+    @Override
+    public String encode(String str) {
+        return this.encodeProcess(str); 
+    }
+
+    @Override
+    public byte[] encode(byte[] str) {
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
     
 }

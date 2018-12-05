@@ -69,7 +69,7 @@ public class CamelConfiguration implements Configuration {
                     //decrypt
 //                    pktdata = "0000000000000000";
                     Gost28147Encryptor gostEncryptor = new Gost28147Encryptor();
-                    String encoded = gostEncryptor.cryptProcess(true, pktdata);
+                    String encoded = gostEncryptor.decodeProcess(true, pktdata);
                     byte[] decodedBytes = 
                             DatatypeConverter.parseHexBinary(encoded);
                     
