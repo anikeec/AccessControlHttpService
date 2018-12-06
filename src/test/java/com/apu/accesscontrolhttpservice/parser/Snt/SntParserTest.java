@@ -5,6 +5,7 @@
  */
 package com.apu.accesscontrolhttpservice.parser.Snt;
 
+import static com.apu.accesscontrolhttpservice.utils.DigitUtils.byteArray2Integer;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -81,7 +82,7 @@ public class SntParserTest {
         int start = 0;
         int length = 3;
         int expResult = 0x200030;
-        int result = instance.byteArray2Integer(array, start, length);
+        int result = byteArray2Integer(array, start, length);
         assertEquals(expResult, result);
     }
     

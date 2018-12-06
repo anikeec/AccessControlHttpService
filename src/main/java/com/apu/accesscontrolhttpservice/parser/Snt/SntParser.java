@@ -6,6 +6,8 @@
 package com.apu.accesscontrolhttpservice.parser.Snt;
 
 import com.apu.accesscontrolhttpservice.parser.Parser;
+import static com.apu.accesscontrolhttpservice.utils.DigitUtils.byte2UnsignedInt;
+import static com.apu.accesscontrolhttpservice.utils.DigitUtils.byteArray2Integer;
 import org.apache.commons.codec.binary.Hex;
 
 /**
@@ -76,7 +78,8 @@ public class SntParser implements Parser {
         ZoneAlarmState[] zoneAlarmStateArray = 
             zoneAlarmStateByte2Array(bytes[ZONE_ALARM_STATE_BITS_START_INDEX]);
 
-        int packetNumber = (int)bytes[PACKET_NUMBER_FOR_ANSWER_BYTE_INDEX]&0xFF;
+        int packetNumber = 
+                byte2UnsignedInt(bytes[PACKET_NUMBER_FOR_ANSWER_BYTE_INDEX]);
         
         String result = 
                 "srcString : " + new String(Hex.encodeHex(bytes)) + "\r\n" +
@@ -104,37 +107,17 @@ public class SntParser implements Parser {
     }
     
     /*------------------------------------------------------------------------*/
-    String arrayToString(Object[] array) {
-        StringBuilder sb = new StringBuilder();
-        for(int i=0; i<array.length; i++) {
-            sb.append("  " + array[i] + " \r\n");
-        }
-        return sb.toString();
-    }
-    
-    /*------------------------------------------------------------------------*/
-    public int byteArray2Integer(byte[] array, int start, int length) {
-        if((start+length)>array.length)
-            throw new IllegalArgumentException("Wrong parameters");
-        int result = 0;
-        for(int i=length; i>0; i--) {
-            result |= ((int)array[start+(length-i)] & 0xFF) << (8*(i-1));
-        }
-        return result;
-    }
-    
-    /*------------------------------------------------------------------------*/
     public int parseSerialNumber(byte[] array) {
-        return this.byteArray2Integer(array, 
-                                        SERIAL_NUMBER_START_BYTE_INDEX, 
-                                        SERIAL_NUMBER_LENGTH);
+        return byteArray2Integer(array, 
+                                    SERIAL_NUMBER_START_BYTE_INDEX, 
+                                    SERIAL_NUMBER_LENGTH);
     }
     
     /*------------------------------------------------------------------------*/
     public int parseLogEvents(byte[] array) {
-        return this.byteArray2Integer(array, 
-                                        LOG_EVENT_CODE_START_INDEX, 
-                                        LOG_EVENT_CODE_LENGTH);
+        return byteArray2Integer(array, 
+                                    LOG_EVENT_CODE_START_INDEX, 
+                                    LOG_EVENT_CODE_LENGTH);
     }
     
     /*------------------------------------------------------------------------*/
@@ -149,10 +132,10 @@ public class SntParser implements Parser {
         
         byte zoneNumber = array[ZONE_AND_FLAGS_AND_COUNTER_START_INDEX];
         int zoneStateIndex = 
-                (int)array[ZONE_AND_FLAGS_AND_COUNTER_START_INDEX + 1]&0xFF;
+            byte2UnsignedInt(array[ZONE_AND_FLAGS_AND_COUNTER_START_INDEX + 1]);
         ZoneState zoneState = ZoneState.values()[zoneStateIndex];
         int zoneCounter = 
-            new Byte(array[ZONE_AND_FLAGS_AND_COUNTER_START_INDEX + 2]).intValue();
+            byte2UnsignedInt(array[ZONE_AND_FLAGS_AND_COUNTER_START_INDEX + 2]);
         
         sb.append("Event zone states : ").append("\r\n");
         sb.append("  zoneNumber : ").append(zoneNumber).append("\r\n");
@@ -167,9 +150,9 @@ public class SntParser implements Parser {
     
     /*------------------------------------------------------------------------*/
     public int parseCmeErrorNumber(byte[] array) {
-        return this.byteArray2Integer(array, 
-                                        CME_ERROR_NUMBER_START_INDEX, 
-                                        CME_ERROR_NUMBER_LENGTH);
+        return byteArray2Integer(array, 
+                                    CME_ERROR_NUMBER_START_INDEX, 
+                                    CME_ERROR_NUMBER_LENGTH);
     }
     
     /*------------------------------------------------------------------------*/
@@ -223,13 +206,13 @@ public class SntParser implements Parser {
         return resultArray;
     }
     
-    
-    
-//    public byte[] byteBits2Array(byte input) {
-//        
-//    }
-    
     /*------------------------------------------------------------------------*/
-
+    String arrayToString(Object[] array) {
+        StringBuilder sb = new StringBuilder();
+        for(int i=0; i<array.length; i++) {
+            sb.append("  " + array[i] + " \r\n");
+        }
+        return sb.toString();
+    }
     
 }

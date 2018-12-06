@@ -6,6 +6,8 @@
 package com.apu.accesscontrolhttpservice.encryptor.Gost28147;
 
 import com.apu.accesscontrolhttpservice.encryptor.Encryptor;
+import static com.apu.accesscontrolhttpservice.utils.DigitUtils.BYTE_MASK;
+import static com.apu.accesscontrolhttpservice.utils.DigitUtils.byte2UnsignedInt;
 import com.apu.accesscontrolhttpservice.utils.PropertyLoader;
 import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.codec.binary.Hex;
@@ -20,7 +22,6 @@ public class Gost28147Encryptor implements Encryptor {
     private final int KEY_BLOCK_ROWS = 8;
     private final int KEY_BLOCK_COLS = 4;
     private final int HANDLING_BUF_SIZE = 24;
-    private final int BYTE_MASK = 0xFF;
     
     private int[][] keyBlock;
     private final int[][] sBlock = {
@@ -127,7 +128,7 @@ public class Gost28147Encryptor implements Encryptor {
         int index = 0;
         for(int row=0; row<KEY_BLOCK_ROWS; row++) {        
             for(int col=0; col<KEY_BLOCK_COLS; col++) {               
-                keyBlock[row][col] = ((int)keyBytes[index++]) & 0xFF;
+                keyBlock[row][col] = byte2UnsignedInt(keyBytes[index++]);
             }
         }
     }
@@ -327,7 +328,7 @@ public class Gost28147Encryptor implements Encryptor {
     private int[] byteBuf2IntBuf(byte[] bytes) {
         int[] result = new int[bytes.length];
         for(int i=0; i<bytes.length; i++) {
-            result[i] = ((int)bytes[i]) & BYTE_MASK;
+            result[i] = byte2UnsignedInt(bytes[i]);
         }
         return result;
     }
