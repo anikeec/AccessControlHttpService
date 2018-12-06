@@ -5,9 +5,17 @@
  */
 package com.apu.accesscontrolhttpservice.parser.Snt;
 
+import com.apu.accesscontrolhttpservice.entity.EventZoneState;
+import com.apu.accesscontrolhttpservice.entity.FullStatePacket;
+import com.apu.accesscontrolhttpservice.entity.ZoneState;
+import com.apu.accesscontrolhttpservice.entity.ZoneLevelState;
+import com.apu.accesscontrolhttpservice.entity.ZoneAlarmState;
 import com.apu.accesscontrolhttpservice.parser.Parser;
+import static com.apu.accesscontrolhttpservice.utils.DigitUtils.arrayToString;
 import static com.apu.accesscontrolhttpservice.utils.DigitUtils.byte2UnsignedInt;
 import static com.apu.accesscontrolhttpservice.utils.DigitUtils.byteArray2Integer;
+import java.util.Date;
+import java.util.List;
 import org.apache.commons.codec.binary.Hex;
 
 /**
@@ -47,7 +55,9 @@ public class SntParser implements Parser {
             
     private final int PACKET_NUMBER_FOR_ANSWER_BYTE_INDEX = 20;
     
-    
+    class PacketWLU {
+        
+    }
     
     @Override
     public Object parse(byte[] bytes) {
@@ -62,18 +72,18 @@ public class SntParser implements Parser {
         
         //user number and flags
         
-        String zoneFlagCounter = parseZoneFlagCounter(bytes);      
+        EventZoneState eventZoneState = parseZoneFlagCounter(bytes);      
         
         int cmeErrorNumber = parseCmeErrorNumber(bytes);
         
-        ZoneLevelState[] zoneLevelStateByte2Array = 
+        ZoneLevelState[] zoneLevelStateArray = 
             zoneLevelStateByte2Array(bytes[ZONE_LEVEL_STATE_BITS_START_INDEX]);
         
-        String deviceTemperature = parseTemperature(bytes);
+        int deviceTemperature = parseTemperature(bytes);
         
-        String sygnalLevel = parseSygnalLevel(bytes);
+        int sygnalLevel = parseSygnalLevel(bytes);
         
-        String deviceVoltage = parseVoltage(bytes);
+        int deviceVoltage = parseVoltage(bytes);
         
         ZoneAlarmState[] zoneAlarmStateArray = 
             zoneAlarmStateByte2Array(bytes[ZONE_ALARM_STATE_BITS_START_INDEX]);
@@ -81,22 +91,11 @@ public class SntParser implements Parser {
         int packetNumber = 
                 byte2UnsignedInt(bytes[PACKET_NUMBER_FOR_ANSWER_BYTE_INDEX]);
         
+        FullStatePacket fullStatePacket = null;
+        
         String result = 
                 "srcString : " + new String(Hex.encodeHex(bytes)) + "\r\n" +
-                "serialNumber : " + serialNumber + "\r\n" +
-                "logEvent : " + logEvent + "\r\n" +
-                "dateTime : " + dateTime + "\r\n" +
-                zoneFlagCounter +
-                "cmeErrorNumber : " + cmeErrorNumber + "\r\n" +
-                "zoneLevelStates :" + "\r\n" +
-                arrayToString(zoneLevelStateByte2Array) +
-                "deviceTemperature : " + deviceTemperature + "\r\n" +
-                "sygnalLevel : " + sygnalLevel + "\r\n" +
-                "deviceVoltage : " + deviceVoltage + "\r\n" +
-                "zoneAlarmStates : " + "\r\n" +
-                arrayToString(zoneAlarmStateArray)
-                
-                ;
+                fullStatePacket.toString();
         
         return "+SRVDBANSW: " + packetNumber + " \r\n" + result;
     }
@@ -123,13 +122,12 @@ public class SntParser implements Parser {
     /*------------------------------------------------------------------------*/
     public String parseDateTime(byte[] array) {
         //TIME_START_INDEX, TIME_LENGTH
+        //8320b55a
         return null;
     }
     
     /*------------------------------------------------------------------------*/
-    String parseZoneFlagCounter(byte[] array) {
-        StringBuilder sb = new StringBuilder();
-        
+    EventZoneState parseZoneFlagCounter(byte[] array) {       
         byte zoneNumber = array[ZONE_AND_FLAGS_AND_COUNTER_START_INDEX];
         int zoneStateIndex = 
             byte2UnsignedInt(array[ZONE_AND_FLAGS_AND_COUNTER_START_INDEX + 1]);
@@ -137,12 +135,7 @@ public class SntParser implements Parser {
         int zoneCounter = 
             byte2UnsignedInt(array[ZONE_AND_FLAGS_AND_COUNTER_START_INDEX + 2]);
         
-        sb.append("Event zone states : ").append("\r\n");
-        sb.append("  zoneNumber : ").append(zoneNumber).append("\r\n");
-        sb.append("  zoneState : ").append(zoneState).append("\r\n");
-        sb.append("  zoneCounter : ").append(zoneCounter).append("\r\n");
-        
-        return sb.toString();
+        return new EventZoneState(zoneNumber, zoneState, zoneCounter);
     }
 
     
@@ -168,30 +161,30 @@ public class SntParser implements Parser {
     }
     
     /*------------------------------------------------------------------------*/
-    String parseTemperature(byte[] array) {
+    int parseTemperature(byte[] array) {
         int result = byteArray2Integer(array, 
                                         TEMPERATURE_START_INDEX, 
                                         TEMPERATURE_LENGTH);
         if(result == 0x80)
-            return "";
+            return 0;
         else
-            return "" + result + " degree";
+            return result;
     }
     
     /*------------------------------------------------------------------------*/
-    String parseSygnalLevel(byte[] array) {
+    int parseSygnalLevel(byte[] array) {
         int result = byteArray2Integer(array, 
                                         SYGNAL_LEVEL_START_INDEX, 
                                         SYGNAL_LEVEL_LENGTH);
-        return "" + result + "%";
+        return result;
     }
     
     /*------------------------------------------------------------------------*/
-    String parseVoltage(byte[] array) {
+    int parseVoltage(byte[] array) {
         int result = byteArray2Integer(array, 
                                         VOLTAGE_LEVEL_START_INDEX, 
                                         VOLTAGE_LEVEL_LENGTH);
-        return "" + result/18;
+        return result/18;
     }
     
     /*------------------------------------------------------------------------*/
@@ -206,13 +199,6 @@ public class SntParser implements Parser {
         return resultArray;
     }
     
-    /*------------------------------------------------------------------------*/
-    String arrayToString(Object[] array) {
-        StringBuilder sb = new StringBuilder();
-        for(int i=0; i<array.length; i++) {
-            sb.append("  " + array[i] + " \r\n");
-        }
-        return sb.toString();
-    }
+    
     
 }

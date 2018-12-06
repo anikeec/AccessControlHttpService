@@ -5,6 +5,8 @@
  */
 package com.apu.accesscontrolhttpservice.utils;
 
+import java.util.List;
+
 /**
  *
  * @author apu
@@ -27,6 +29,24 @@ public class DigitUtils {
             result |= byte2UnsignedInt(array[start+(length-i)]) << (8*(i-1));
         }
         return result;
+    }
+    
+    /*------------------------------------------------------------------------*/
+    public static String arrayToString(Object[] array) {
+        StringBuilder sb = new StringBuilder();
+        for (Object obj : array) {
+            sb.append("  ").append(obj).append(" \r\n");
+        }
+        return sb.toString();
+    }
+    
+    /*------------------------------------------------------------------------*/
+    public static String listToString(List list) {
+        StringBuilder sb = new StringBuilder();
+        for(Object obj : list) {
+            sb.append("  ").append(obj).append(" \r\n");
+        }
+        return sb.toString();
     }
     
 }

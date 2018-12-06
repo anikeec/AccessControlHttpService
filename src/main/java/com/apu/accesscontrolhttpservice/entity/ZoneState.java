@@ -3,16 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.apu.accesscontrolhttpservice.parser.Snt;
+package com.apu.accesscontrolhttpservice.entity;
 
 /**
  *
  * @author apu
  */
-public enum ZoneLevelState {
+public enum ZoneState {
     
+    NORMAL,
     SHORTED,
-    
+    NORMAL1,
     OPENED
     
 }
