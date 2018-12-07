@@ -14,9 +14,15 @@ import com.apu.accesscontrolhttpservice.parser.Parser;
 import static com.apu.accesscontrolhttpservice.utils.DigitUtils.arrayToString;
 import static com.apu.accesscontrolhttpservice.utils.DigitUtils.byte2UnsignedInt;
 import static com.apu.accesscontrolhttpservice.utils.DigitUtils.byteArray2Integer;
+import java.time.DateTimeException;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -55,6 +61,8 @@ public class SntParser implements Parser {
             
     private final int PACKET_NUMBER_FOR_ANSWER_BYTE_INDEX = 20;
     
+    private static final Logger LOGGER = LogManager.getLogger(SntParser.class);
+    
     class PacketWLU {
         
     }
@@ -68,7 +76,7 @@ public class SntParser implements Parser {
         
         int logEvent = parseLogEvents(bytes);
         
-        String dateTime = parseDateTime(bytes);
+        Date dateTime = parseDateTime(bytes);
         
         //user number and flags
         
@@ -120,10 +128,37 @@ public class SntParser implements Parser {
     }
     
     /*------------------------------------------------------------------------*/
-    public String parseDateTime(byte[] array) {
-        //TIME_START_INDEX, TIME_LENGTH
-        //8320b55a
-        return null;
+    public Date parseDateTime(byte[] array) {
+        Date date = null;
+        boolean timeSetted = false;
+        try {
+            int encodedTime = 
+                    byteArray2Integer(array, TIME_START_INDEX, TIME_LENGTH);
+            timeSetted = ((encodedTime&0x8000000) != 0);
+            int year = 2013 + ((encodedTime&0x000000F0)>>4);
+            int month = (encodedTime&0x0000000F);            
+            int day = (encodedTime&0x00001F00)>>8;
+            int hours = (encodedTime&0x001F0000)>>16;
+            int minutes = (encodedTime&0x3F000000)>>24;
+            int seconds = (encodedTime&0x0000E000)>>10 +
+                            (encodedTime&0x00E00000)>>21;
+            assert (month >= 0) && (month <= 12);
+            assert (day > 0) && (day <= 31);
+            assert (hours >= 0) && (hours < 24);
+            assert (minutes >= 0) && (minutes <= 60);
+            assert (seconds >= 0) && (seconds <= 60);
+            LocalDateTime ldt = 
+                LocalDateTime.of(year, Month.of(month), day, hours, minutes, seconds);
+            date = Date.from(ldt.toInstant(ZoneOffset.UTC));
+        } catch(AssertionError aex) {
+            LOGGER.catching(aex);
+        } catch (DateTimeException ex) {
+            LOGGER.catching(ex);
+        }
+        if(timeSetted)
+            return date;
+        else
+            return null;
     }
     
     /*------------------------------------------------------------------------*/

@@ -22,6 +22,8 @@ public class DigitUtils {
     
     /*------------------------------------------------------------------------*/
     public static int byteArray2Integer(byte[] array, int start, int length) {
+        if(length > 4)
+            throw new IllegalArgumentException("Length has to be less than 4.");
         if((start+length)>array.length)
             throw new IllegalArgumentException("Wrong parameters");
         int result = 0;
