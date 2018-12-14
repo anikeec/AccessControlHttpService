@@ -6,7 +6,8 @@
 package com.apu.accesscontrolhttpservice.entity;
 
 import static com.apu.accesscontrolhttpservice.utils.DigitUtils.listToString;
-import java.util.Date;
+import java.sql.Time;
+import java.sql.Date;
 import java.util.List;
 
 /**
@@ -14,17 +15,23 @@ import java.util.List;
  * @author apu
  */
 public class FullStatePacket {
-    private int serialNumber;
-    private int logEvent;
-    private Date dateTime;        
-    private EventZoneState eventZoneState;        
-    private int cmeErrorNumber;
-    private List<ZoneLevelState> zoneLevelStateArray;
-    private int deviceTemperature;
-    private int sygnalLevel;
-    private int deviceVoltage;
+    private int serialNumber;               //device's serial number
+    private int logEvent;                   //
+    private Date date;
+    private Time time;
+    @Transient
+    private Date dateTime;                  //date&time of message (separate date & time for better productivity)
+    private EventZoneState eventZoneState;  //if message was triggered by some event
+                                            //this object contains event's details
+    private int cmeErrorNumber;             //if we have some event we can see its number
+    private List<ZoneLevelState> zoneLevelStateArray; 
+                                            //zones levels current state(Shorted | Open)
+    private int deviceTemperature;          //device's temperature
+    private int sygnalLevel;                //device's GSM sygnal level
+    private int deviceVoltage;              //device's supply voltage
     private List<ZoneAlarmState> zoneAlarmStateArray;
-    private int packetNumber;
+                                            //here we can see if some zones have alarm                                            
+    private int packetNumber;               //packet number
 
     @Override
     public String toString() {

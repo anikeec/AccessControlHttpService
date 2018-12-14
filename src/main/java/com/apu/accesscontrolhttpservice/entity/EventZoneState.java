@@ -11,9 +11,9 @@ package com.apu.accesscontrolhttpservice.entity;
  */
 public class EventZoneState {
     
-    private int zoneNumber;
-    private ZoneState zoneState;
-    private int zoneCounter;
+    private int zoneNumber;         //zone's number
+    private ZoneState zoneState;    //zone's state (NORMAL | SHORTED | NORMAL1 | OPENED)
+    private int zoneCounter;        //zone's alarm counter
 
     public EventZoneState(int zoneNumber, ZoneState zoneState, int zoneCounter) {
         this.zoneNumber = zoneNumber;
